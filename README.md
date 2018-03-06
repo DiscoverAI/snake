@@ -3,6 +3,9 @@ A [re-frame](https://github.com/Day8/re-frame) Snake game for the browser.
 
 Interact with your keyboard or with its api.
 
+The purpose of this game is to be used as a test bed for running
+Reinforcement Learning algorithms.
+
 ## Development Mode
 
 ### Run application:
