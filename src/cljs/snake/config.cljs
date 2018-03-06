@@ -1,4 +1,4 @@
-(ns snake-figwheel.config)
+(ns snake.config)
 
 (def debug?
   ^boolean goog.DEBUG)

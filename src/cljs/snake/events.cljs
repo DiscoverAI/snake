@@ -1,6 +1,6 @@
-(ns snake-figwheel.events
+(ns snake.events
   (:require [re-frame.core :as re-frame]
-            [snake-figwheel.db :as db]))
+            [snake.db :as db]))
 
 (re-frame/reg-event-db
  ::initialize-db

@@ -1,0 +1,2 @@
+{:server-port #ts/env [:port "8080"]
+ :metrics     {:prometheus {:metrics-path "/metrics"}}}

@@ -1,6 +1,6 @@
-(ns snake-figwheel.views
+(ns snake.views
   (:require [re-frame.core :as re-frame]
-            [snake-figwheel.subs :as subs]
+            [snake.subs :as subs]
             ))
 
 (defn main-panel []

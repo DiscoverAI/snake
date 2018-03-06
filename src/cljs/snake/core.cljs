@@ -1,9 +1,9 @@
-(ns snake-figwheel.core
+(ns snake.core
   (:require [reagent.core :as reagent]
             [re-frame.core :as re-frame]
-            [snake-figwheel.events :as events]
-            [snake-figwheel.views :as views]
-            [snake-figwheel.config :as config]))
+            [snake.events :as events]
+            [snake.views :as views]
+            [snake.config :as config]))
 
 
 (defn dev-setup []
