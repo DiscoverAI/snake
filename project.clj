@@ -1,6 +1,6 @@
-(defproject snake-figwheel "0.1.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.908"]
+(defproject com.github.discoverAI/snake "0.1.0-SNAPSHOT"
+  :dependencies [[org.clojure/clojure "1.9.0"]
+                 [org.clojure/clojurescript "1.10.126"]
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]]
 
@@ -14,35 +14,24 @@
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
-  :profiles
-  {:dev
-   {:dependencies [[binaryage/devtools "0.9.4"]]
+  :profiles {:dev {:dependencies [[binaryage/devtools "0.9.9"]]
+                   :plugins      [[lein-figwheel "0.5.13"]]}}
 
-    :plugins      [[lein-figwheel "0.5.13"]]}}
-
-  :cljsbuild
-  {:builds
-   [{:id           "dev"
-     :source-paths ["src/cljs"]
-     :figwheel     {:on-jsload "snake-figwheel.core/mount-root"}
-     :compiler     {:main                 snake-figwheel.core
-                    :output-to            "resources/public/js/compiled/app.js"
-                    :output-dir           "resources/public/js/compiled/out"
-                    :asset-path           "js/compiled/out"
-                    :source-map-timestamp true
-                    :preloads             [devtools.preload]
-                    :external-config      {:devtools/config {:features-to-install :all}}
-                    }}
-
-    {:id           "min"
-     :source-paths ["src/cljs"]
-     :compiler     {:main            snake-figwheel.core
-                    :output-to       "resources/public/js/compiled/app.js"
-                    :optimizations   :advanced
-                    :closure-defines {goog.DEBUG false}
-                    :pretty-print    false}}
-
-
-    ]}
-
-  )
+  :cljsbuild {:builds [{:id           "dev"
+                        :source-paths ["src/cljs"]
+                        :figwheel     {:on-jsload "snake-figwheel.core/mount-root"}
+                        :compiler     {:main                 snake-figwheel.core
+                                       :output-to            "resources/public/js/compiled/app.js"
+                                       :output-dir           "resources/public/js/compiled/out"
+                                       :asset-path           "js/compiled/out"
+                                       :source-map-timestamp true
+                                       :preloads             [devtools.preload]
+                                       :external-config      {:devtools/config {:features-to-install :all}}
+                                       }}
+                       {:id           "min"
+                        :source-paths ["src/cljs"]
+                        :compiler     {:main            snake-figwheel.core
+                                       :output-to       "resources/public/js/compiled/app.js"
+                                       :optimizations   :advanced
+                                       :closure-defines {goog.DEBUG false}
+                                       :pretty-print    false}}]})

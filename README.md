@@ -21,3 +21,6 @@ To compile clojurescript to javascript:
 lein clean
 lein cljsbuild once min
 ```  
+
+## Test
+Read [this](https://github.com/Day8/re-frame/wiki/Testing)
