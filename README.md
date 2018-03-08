@@ -36,6 +36,8 @@ To run the frontend and the backend tests:
 ```bash
 lein test-all
 ```
+Please note the section _**Frontend tests**_ for more details about running the
+frontend tests.
 
 For testing reframe apps read [this](https://github.com/Day8/re-frame/wiki/Testing).
 
@@ -45,8 +47,17 @@ lein doo once
 ```
 This will run all tests that are passed within `test/snake/test_runner.cljs`.
 
-Currently only phantom.js tests are supported. Phantom.js comes within the `./dev-resources`
-folder. There is only a phantom.js version for linux included as of now. 
+The tests will be executed with phantom.js. By default the phantom.js binary found in 
+`./dev-resources` will be used to execute the tests. The shipped version of phantom.js
+only works for linux.
+If you want to specify a custom phantom.js binary (e.g. you are working with MacOS and
+need another phantom.js binary) export a environment variable `PHANTOMJSBIN` which has
+the path to your custom phantom.js binary. 
+
+For example:
+```bash
+export PHANTOMJSBIN="phantomjs" && lein doo once 
+```
 
 ### Backend tests
 ```bash

@@ -1,3 +1,6 @@
+(def phantomjs-bin (or (System/getenv "PHANTOMJSBIN")
+                     "./dev-resources/phantomjs-2.1.1-linux-x86_64"))
+
 (defproject com.github.discoverAI/snake "0.1.0-SNAPSHOT"
   :description "A Clojure/ClojureScript Snake game for your browser"
   :url "https://github.com/DiscoverAI/snake"
@@ -27,7 +30,7 @@
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
   :doo {:build "test"
         :alias {:default [:phantom]}
-        :paths {:phantom "./dev-resources/phantomjs-2.1.1-linux-x86_64"}}
+        :paths {:phantom ~phantomjs-bin}}
   :lein-release {:deploy-via :clojars}
   :figwheel {:css-dirs ["resources/public/css"]}
 
