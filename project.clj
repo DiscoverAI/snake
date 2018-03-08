@@ -3,30 +3,33 @@
   :url "https://github.com/DiscoverAI/snake"
   :license {:name "MIT"}
   :scm {:name "git"
-        :url  "https://github.com/DiscoverAI/snake"}
+        :url  "https://github.com/DiscoverAI/snake.git"}
+
+  :min-lein-version "2.5.3"
 
   :dependencies [[org.clojure/clojure "1.9.0"]
-                 [org.clojure/clojurescript "1.10.126"]
+                 [org.clojure/clojurescript "1.10.145"]
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]
                  [com.taoensso/sente "1.12.0"]
                  [de.otto/tesla-microservice "0.11.25"]
                  [de.otto/tesla-httpkit "1.0.1"]]
-
-  :plugins [[lein-cljsbuild "1.1.5"]]
-  :min-lein-version "2.5.3"
-  :source-paths ["src/clj"]
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
-  :figwheel {:css-dirs ["resources/public/css"]}
-
   :exclusions [org.slf4j/slf4j-nop commons-logging log4j/log4j org.slf4j/slf4j-log4j12]
+  :plugins [[lein-cljsbuild "1.1.5"]
+            [lein-doo "0.1.8"]]
+  :aliases {"test-all" ["do" "test" ["doo" "once"]]}
+
   :main ^:skip-aot snake.core
-
-  :lein-release {:deploy-via :clojars}
-
+  :source-paths ["src/clj"]
   :profiles {:dev {:dependencies [[binaryage/devtools "0.9.9"]]
                    :plugins      [[lein-figwheel "0.5.13"]
                                   [lein-release/lein-release "1.0.9"]]}}
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  :doo {:build "test"
+        :alias {:default [:phantom]}
+        :paths {:phantom "./dev-resources/phantomjs-2.1.1-linux-x86_64"}}
+  :lein-release {:deploy-via :clojars}
+  :figwheel {:css-dirs ["resources/public/css"]}
 
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src/cljs"]
@@ -45,4 +48,10 @@
                                        :output-to       "resources/public/js/compiled/app.js"
                                        :optimizations   :advanced
                                        :closure-defines {goog.DEBUG false}
-                                       :pretty-print    false}}]})
+                                       :pretty-print    false}}
+                       {:id           "test"
+                        :source-paths ["src/cljs" "test"]
+                        :compiler     {:main          snake.test-runner
+                                       :output-to     "resources/public/js/compiled/tests.js"
+                                       :output-dir    "resources/public/js/compiled/test/out"
+                                       :optimizations :none}}]})

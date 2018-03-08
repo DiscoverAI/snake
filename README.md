@@ -32,4 +32,23 @@ lein cljsbuild once min
 ```  
 
 ## Test
-Read [this](https://github.com/Day8/re-frame/wiki/Testing)
+To run the frontend and the backend tests:
+```bash
+lein test-all
+```
+
+For testing reframe apps read [this](https://github.com/Day8/re-frame/wiki/Testing).
+
+### Frontend tests
+```bash
+lein doo once
+```
+This will run all tests that are passed within `test/snake/test_runner.cljs`.
+
+Currently only phantom.js tests are supported. Phantom.js comes within the `./dev-resources`
+folder. There is only a phantom.js version for linux included as of now. 
+
+### Backend tests
+```bash
+lein test
+```
