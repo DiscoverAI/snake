@@ -11,7 +11,7 @@ Reinforcement Learning algorithms.
 ## Development Mode
 
 ### Run Frontend
-```
+```bash
 lein clean
 lein figwheel dev
 ```
@@ -19,14 +19,14 @@ Figwheel will automatically push cljs changes to the browser.
 
 Wait a bit, then browse to [http://localhost:3449](http://localhost:3449).
 ### Run Backend
-```
+```bash
 lein run
 ```
 The Backend will be accessible on [http://localhost:8080](http://localhost:8080).
 
 ## Production Build
 To compile clojurescript to javascript:
-```
+```bash
 lein clean
 lein cljsbuild once min
 ```  
