@@ -1,28 +1,24 @@
-(ns snake.token_test
+(ns snake.token-test
   (:require [clojure.test :refer :all]
-            [snake.token :as dir]))
+            [snake.token :as t]))
 
-(deftest change-direction-test-move-left
+(deftest change-direction-test
   (testing "Turning left should yield the correct direction vector"
-    (is (= [1 0]
-           (dir/change-direction [0 1] :left)))
-    (is (= [0 -1]
-           (dir/change-direction [1 0] :left)))
     (is (= [-1 0]
-           (dir/change-direction [0 -1] :left)))
+           (t/change-direction [0 1] t/LEFT)))
     (is (= [0 1]
-           (dir/change-direction [-1 0] :left)))
-    ))
+           (t/change-direction [1 0] t/LEFT)))
+    (is (= [1 0]
+           (t/change-direction [0 -1] t/LEFT)))
+    (is (= [0 -1]
+           (t/change-direction [-1 0] t/LEFT))))
 
-(deftest change-direction-test-move-right
   (testing "Turning right should yield the correct direction vector"
-    (is (= [-1 0]
-           (dir/change-direction [0 1] :right)))
-    (is (= [0 1]
-           (dir/change-direction [1 0] :right)))
     (is (= [1 0]
-           (dir/change-direction [0 -1] :right)))
+           (t/change-direction [0 1] t/RIGHT)))
     (is (= [0 -1]
-           (dir/change-direction [-1 0] :right)))
-    ))
-
+           (t/change-direction [1 0] t/RIGHT)))
+    (is (= [-1 0]
+           (t/change-direction [0 -1] t/RIGHT)))
+    (is (= [0 1]
+           (t/change-direction [-1 0] t/RIGHT)))))
