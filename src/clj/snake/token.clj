@@ -1,4 +1,4 @@
-(ns snake.direction)
+(ns snake.token)
 
 (defn change-direction
   [current-direction change]
