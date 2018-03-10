@@ -2,7 +2,11 @@
   (:require [re-frame.core :as re-frame]
             [com.github.discoverAI.snake.db :as db]))
 
+(defn handle-init-db
+  [_coeffects _event]
+  db/default-db
+  )
+
 (re-frame/reg-event-db
- ::initialize-db
- (fn  [_ _]
-   db/default-db))
+  ::initialize-db
+  handle-init-db)
