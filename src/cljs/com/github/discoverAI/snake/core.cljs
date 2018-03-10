@@ -1,9 +1,9 @@
 (ns com.github.discoverAI.snake.core
   (:require [reagent.core :as reagent]
             [re-frame.core :as re-frame]
-            [snake.events :as events]
-            [snake.views :as views]
-            [snake.config :as config]))
+            [com.github.discoverAI.snake.events :as events]
+            [com.github.discoverAI.snake.views :as views]
+            [com.github.discoverAI.snake.config :as config]))
 
 
 (defn dev-setup []

@@ -23,7 +23,7 @@
             [lein-doo "0.1.8"]]
   :aliases {"test-all" ["do" "test" ["doo" "once"]]}
 
-  :main ^:skip-aot snake.core
+  :main ^:skip-aot com.github.discoverAI.snake.core
   :source-paths ["src/clj"]
   :profiles {:dev {:dependencies [[binaryage/devtools "0.9.9"]]
                    :plugins      [[lein-figwheel "0.5.13"]
@@ -38,8 +38,8 @@
 
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src/cljs"]
-                        :figwheel     {:on-jsload "snake.core/mount-root"}
-                        :compiler     {:main                 snake.core
+                        :figwheel     {:on-jsload "com.github.discoverAI.snake.core/mount-root"}
+                        :compiler     {:main                 com.github.discoverAI.snake.core
                                        :output-to            "resources/public/js/compiled/app.js"
                                        :output-dir           "resources/public/js/compiled/out"
                                        :asset-path           "js/compiled/out"
@@ -49,14 +49,14 @@
                                        }}
                        {:id           "min"
                         :source-paths ["src/cljs"]
-                        :compiler     {:main            snake.core
+                        :compiler     {:main            com.github.discoverAI.snake.core
                                        :output-to       "resources/public/js/compiled/app.js"
                                        :optimizations   :advanced
                                        :closure-defines {goog.DEBUG false}
                                        :pretty-print    false}}
                        {:id           "test"
                         :source-paths ["src/cljs" "test/cljs"]
-                        :compiler     {:main          snake.test-runner
+                        :compiler     {:main          com.github.discoverAI.snake.test-runner
                                        :output-to     "resources/public/js/compiled/tests.js"
                                        :output-dir    "resources/public/js/compiled/test/out"
                                        :optimizations :none}}]})
