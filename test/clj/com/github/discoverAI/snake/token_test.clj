@@ -1,6 +1,6 @@
-(ns snake.token-test
+(ns com.github.discoverAI.snake.token-test
   (:require [clojure.test :refer :all]
-            [snake.token :as t]))
+            [com.github.discoverAI.snake.token :as t]))
 
 (deftest change-direction-test
   (testing "Turning left should yield the correct direction vector"

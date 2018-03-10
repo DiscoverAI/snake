@@ -1,4 +1,4 @@
-(ns snake.events
+(ns com.github.discoverAI.snake.events
   (:require [re-frame.core :as re-frame]
             [snake.db :as db]))
 

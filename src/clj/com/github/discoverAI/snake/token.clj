@@ -1,4 +1,4 @@
-(ns snake.token)
+(ns com.github.discoverAI.snake.token)
 
 (def LEFT (/ Math/PI 2))
 (def RIGHT (* -1 (/ Math/PI 2)))

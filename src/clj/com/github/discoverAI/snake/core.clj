@@ -1,4 +1,4 @@
-(ns snake.core
+(ns com.github.discoverAI.snake.core
   (:require [de.otto.tesla.system :as system]
             [de.otto.goo.goo :as goo]
             [iapetos.collector.jvm :as jvm]

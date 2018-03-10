@@ -1,4 +1,4 @@
-(ns snake.board)
+(ns com.github.discoverAI.snake.board)
 
 (defn- median [x]
   (int (Math/ceil (/ x 2))))

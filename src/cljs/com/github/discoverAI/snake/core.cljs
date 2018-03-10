@@ -1,4 +1,4 @@
-(ns snake.core
+(ns com.github.discoverAI.snake.core
   (:require [reagent.core :as reagent]
             [re-frame.core :as re-frame]
             [snake.events :as events]

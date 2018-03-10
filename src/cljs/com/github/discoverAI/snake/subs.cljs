@@ -1,4 +1,4 @@
-(ns snake.subs
+(ns com.github.discoverAI.snake.subs
   (:require [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub

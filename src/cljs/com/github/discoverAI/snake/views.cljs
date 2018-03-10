@@ -1,4 +1,4 @@
-(ns snake.views
+(ns com.github.discoverAI.snake.views
   (:require [re-frame.core :as re-frame]
             [snake.subs :as subs]
             ))

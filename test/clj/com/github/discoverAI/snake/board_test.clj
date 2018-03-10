@@ -1,6 +1,6 @@
-(ns snake.board-test
+(ns com.github.discoverAI.snake.board-test
   (:require [clojure.test :refer :all]
-            [snake.board :as b]))
+            [com.github.discoverAI.snake.board :as b]))
 
 (deftest initial-snake-position-base-vector-test
   (testing "base vector for snake length 3"
