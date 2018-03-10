@@ -5,12 +5,15 @@
             [de.otto.tesla.serving-with-httpkit :as httpkit]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as c]
-            [com.github.discoverAI.snake.engine :as e]))
+            [com.github.discoverAI.snake.engine :as eg]
+            [com.github.discoverAI.snake.endpoint :as ep]))
 
 (defn snake-system [runtime-config]
   (-> (system/base-system runtime-config)
-      (assoc :engine (c/using (e/new-engine) [:app-status]))
-      (httpkit/add-server)))
+      (assoc
+        :engine (c/using (eg/new-engine) [:app-status])
+        :endpoint (c/using (ep/new-endpoint) [:handler :engine]))
+      (httpkit/add-server :endpoint)))
 
 (defonce _ (jvm/initialize (goo/snapshot)))
 (defonce _ (Thread/setDefaultUncaughtExceptionHandler
