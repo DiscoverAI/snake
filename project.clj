@@ -9,6 +9,7 @@
         :url  "https://github.com/DiscoverAI/snake.git"}
 
   :min-lein-version "2.5.3"
+  :test-paths ["test/clj" "test/cljs"]
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.145"]
@@ -53,7 +54,7 @@
                                        :closure-defines {goog.DEBUG false}
                                        :pretty-print    false}}
                        {:id           "test"
-                        :source-paths ["src/cljs" "test"]
+                        :source-paths ["src/cljs" "test/cljs"]
                         :compiler     {:main          snake.test-runner
                                        :output-to     "resources/public/js/compiled/tests.js"
                                        :output-dir    "resources/public/js/compiled/test/out"
