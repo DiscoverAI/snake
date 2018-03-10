@@ -3,8 +3,7 @@
             [com.github.discoverAI.snake.subs :as subs]))
 
 (def table
-  [:table.stage {:style {:height 377
-                         :width  527}} ])
+  [:table.container])
 
 (defn pos-is-snake
   [snake pos]
@@ -34,8 +33,7 @@
 (defn render-board
   [width height snake]
   (let [cells (for [y (range height)]
-                (create-row width y snake))
-        ]
+                (create-row width y snake))]
     (conj table [:tbody cells]))
   )
 
