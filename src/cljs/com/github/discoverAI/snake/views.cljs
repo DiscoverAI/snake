@@ -1,5 +1,6 @@
 (ns com.github.discoverAI.snake.views
-  (:require [re-frame.core  :refer [subscribe dispatch]]))
+  (:require [re-frame.core  :refer [subscribe dispatch]]
+            [com.github.discoverAI.snake.subs :as subs]))
 
 (def table
   [:table.stage {:style {:height 377
@@ -10,19 +11,22 @@
   (boolean ((into #{} snake) pos))
   )
 
+(defn cell-item-for
+  [current-pos snake]
+  (cond
+    (pos-is-snake snake current-pos)
+    [:td.snake]
+    :else
+    [:td.cell]
+    )
+  )
+
 (defn create-row
   [width y snake]
-  ; Without the key pro, we get an error
-  ; I don't see why
   (into [:tr {:key y}]
         (for [x (range width)
               :let [current-pos [x y]]]
-          (cond
-            (pos-is-snake snake current-pos)
-            [:td.snake-on-cell]
-            :else
-            [:td.point]
-            )
+          (cell-item-for current-pos snake)
           )
         )
   )
@@ -37,8 +41,8 @@
 
 (defn board
   []
-  (let [[grid-width grid-height] @(subscribe [:subs/board])
-        [snake-positions] @(subscribe [:subs/snake-position])]
+  (let [[grid-width grid-height] @(subscribe [:game-board-bounds])
+        snake-positions @(subscribe [:snake-position])]
     (render-board grid-width grid-height snake-positions)
     )
   )

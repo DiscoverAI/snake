@@ -3,7 +3,7 @@
 (def default-db
   ;TODO get State from backend
   {:name "re-frame"
-   :board  [10 10]
+   :board  [20 20]
    :tokens {:snake {:position  [[3 5] [2 5] [1 5]]
                     :direction [1 0]
                     :speed     1.0}}})
