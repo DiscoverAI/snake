@@ -7,9 +7,9 @@
             [com.stuartsierra.component :as c]
             [com.github.discoverAI.snake.engine :as e]))
 
-(defn peppermint-butler-system [runtime-config]
+(defn snake-system [runtime-config]
   (-> (system/base-system runtime-config)
-      (assoc :engine (c/using (e/new-engine) [:config :app-status]))
+      (assoc :engine (c/using (e/new-engine) [:app-status]))
       (httpkit/add-server)))
 
 (defonce _ (jvm/initialize (goo/snapshot)))
@@ -19,4 +19,4 @@
                  (log/error ex "Uncaught exception on " (.getName thread))))))
 
 (defn -main [& _]
-  (system/start (peppermint-butler-system {})))
+  (system/start (snake-system {})))
