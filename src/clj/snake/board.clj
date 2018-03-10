@@ -1,4 +1,4 @@
-(ns snake.gameboard)
+(ns snake.board)
 
 (defn- median [x]
   (int (Math/ceil (/ x 2))))
