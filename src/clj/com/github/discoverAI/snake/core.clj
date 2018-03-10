@@ -3,15 +3,14 @@
             [de.otto.goo.goo :as goo]
             [iapetos.collector.jvm :as jvm]
             [de.otto.tesla.serving-with-httpkit :as httpkit]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [com.stuartsierra.component :as c]
+            [com.github.discoverAI.snake.engine :as e]))
 
 (defn peppermint-butler-system [runtime-config]
-  (-> (system/base-system (merge {:name "snake-backend"} runtime-config))
-      #_(assoc
-          :endpoint (c/using (new-endpoint) [:dependencies])
-                    )
-      (httpkit/add-server                                   ;:endpoint
-        )))
+  (-> (system/base-system runtime-config)
+      (assoc :engine (c/using (e/new-engine) [:config :app-status]))
+      (httpkit/add-server)))
 
 (defonce _ (jvm/initialize (goo/snapshot)))
 (defonce _ (Thread/setDefaultUncaughtExceptionHandler

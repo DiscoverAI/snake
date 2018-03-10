@@ -17,8 +17,10 @@
                  [re-frame "0.10.5"]
                  [com.taoensso/sente "1.12.0"]
                  [de.otto/tesla-microservice "0.11.25"]
-                 [de.otto/tesla-httpkit "1.0.1"]]
-  :exclusions [org.slf4j/slf4j-nop commons-logging log4j/log4j org.slf4j/slf4j-log4j12]
+                 [de.otto/tesla-httpkit "1.0.1"]
+                 [org.clojure/tools.logging "0.4.0"]
+                 [ch.qos.logback/logback-classic "1.2.3"]]
+
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-doo "0.1.8"]]
   :aliases {"test-all" ["do" "test" ["doo" "once"]]}
