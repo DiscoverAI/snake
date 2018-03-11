@@ -15,7 +15,7 @@
 
 (defn mount-root []
   (re-frame/clear-subscription-cache!)
-  (reagent/render [views/main-panel]
+  (reagent/render [views/base-template]
                   (.getElementById js/document "app")))
 
 (let [{:keys [chsk ch-recv send-fn state]}

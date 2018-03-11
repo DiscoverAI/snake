@@ -1,19 +1,16 @@
 (ns com.github.discoverAI.snake.subs
-  (:require [re-frame.core :refer [reg-sub]]))
+  (:require [re-frame.core :as re-frame]))
 
-(reg-sub
-  ::name
-  (fn [db]
-    (:name db)))
+(defn game-board [db]
+  (:board db))
 
-(defn get-board [db] (:board db))
+(re-frame/reg-sub
+  ::game-board
+  game-board)
 
-(reg-sub
-  :game-board-bounds
-  get-board)
+(defn snake [db]
+  (get-in db [:tokens :snake]))
 
-(defn get-snake-position [db] (:position (:snake (:tokens db))))
-
-(reg-sub
-  :snake-position
-  get-snake-position)
+(re-frame/reg-sub
+  ::snake
+  snake)

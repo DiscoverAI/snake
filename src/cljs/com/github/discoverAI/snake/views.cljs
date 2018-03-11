@@ -26,9 +26,18 @@
     (conj table [:tbody cells])))
 
 (defn board []
-  (let [[grid-width grid-height] @(subscribe [:game-board-bounds])
-        snake-positions @(subscribe [:snake-position])]
-    (render-board grid-width grid-height snake-positions)))
+  (let [[grid-width grid-height] @(subscribe [::subs/game-board])
+        snake (subscribe [::subs/snake])]
+    (render-board grid-width grid-height snake)))
 
-(defn main-panel []
-  [board])
+(defn info-panel []
+  [:header "Snake"])
+
+(defn hints []
+  [:footer "footer"])
+
+(defn base-template []
+  [:div {:class "wrapper"}
+   [info-panel]
+   #_[board]
+   [hints]])

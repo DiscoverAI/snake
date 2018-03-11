@@ -2,17 +2,19 @@
   (:require [cljs.test :refer-macros [deftest is testing]]
             [com.github.discoverAI.snake.subs :as subs]))
 
-(def mock-db
-  {:name   "re-frame"
-   :board  [10 10]
-   :tokens {:snake {:position  [[3 5] [2 5] [1 5]]
+(def game-20-20-3
+  {:board  [20 20]
+   :tokens {:snake {:position  [[11 10] [10 10] [9 10]]
                     :direction [1 0]
                     :speed     1.0}}})
 
-(deftest get-board-test
-  (is (= [10 10]
-         (subs/get-board mock-db))))
+(deftest subscribe-to-board-test
+  (testing "Should yield the board"
+    (is (= [20 20]
+           (subs/game-board game-20-20-3)))))
 
-(deftest get-position-test
-  (is (= [[3 5] [2 5] [1 5]]
-         (subs/get-snake-position mock-db))))
+(deftest subscribe-to-snake-test
+  (is (= {:position  [[11 10] [10 10] [9 10]]
+          :direction [1 0]
+          :speed     1.0}
+         (subs/snake game-20-20-3))))
