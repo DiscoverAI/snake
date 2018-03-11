@@ -4,6 +4,17 @@
 
 (def table [:table.container])
 
+(def container-view
+  [:table.container])
+
+(def container-body
+  [:tbody])
+
+(defn row-container
+  [key]
+  [:tr {:key key}])
+
+
 (defn pos-is-snake [snake pos]
   (boolean ((into #{} snake) pos)))
 
@@ -14,21 +25,25 @@
     :else
     [:td.cell]))
 
-(defn create-row [width y snake]
-  (into [:tr {:key y}]
-        (for [x (range width)
-              :let [current-pos [x y]]]
-          (cell-item-for current-pos snake))))
+(defn create-row
+  [width y snake]
+  (into (row-container y)
+        (for [x (range width) :let [current-pos [x y]]]
+          (cell-item-for current-pos snake))
+        ))
 
-(defn render-board [width height snake]
-  (let [cells (for [y (range height)]
-                (create-row width y snake))]
-    (conj table [:tbody cells])))
+(defn render-board
+  [width height snake]
+  (print snake)
+  (let [cells  (for [y (range height)]
+                     (create-row width y snake))]
+    (conj container-view (into container-body cells))
+    ))
 
 (defn board []
   (let [[grid-width grid-height] @(subscribe [::subs/game-board])
-        snake (subscribe [::subs/snake])]
-    (render-board grid-width grid-height snake)))
+        snake @(subscribe [::subs/snake])]
+    (render-board grid-width grid-height (:position snake))))
 
 (defn info-panel []
   [:header "Snake"])
@@ -37,7 +52,7 @@
   [:footer "footer"])
 
 (defn base-template []
-  [:div {:class "wrapper"}
+  [:div.wrapper
    [info-panel]
-   #_[board]
+   [board]
    [hints]])

@@ -26,10 +26,11 @@
 
 (deftest render-board-test
   (testing "If board is rendered correctly"
-    (is (= (views/render-board 2 2 [[1 0]])
-           (into views/table [[:tbody '([:tr {:key 0} [:td.cell] [:td.snake]]
-                                         [:tr {:key 1} [:td.cell] [:td.cell]])]])))
-
     (is (= (views/render-board 2 2 [[0 1] [1 1]])
-           (into views/table [[:tbody '([:tr {:key 0} [:td.cell] [:td.cell]]
-                                         [:tr {:key 1} [:td.snake] [:td.snake]])]])))))
+           (into views/container-view [(into views/container-body [
+                                                                   (into (views/row-container 0) [[:td.cell] [:td.cell]])
+                                                                   (into (views/row-container 1) [[:td.snake] [:td.snake]])])])))
+    (is (= (views/render-board 2 2 [[1 0]])
+           (into views/container-view [(into views/container-body [
+                                                                   (into (views/row-container 0) [[:td.cell] [:td.snake]])
+                                                                   (into (views/row-container 1) [[:td.cell] [:td.cell]])])])))))
