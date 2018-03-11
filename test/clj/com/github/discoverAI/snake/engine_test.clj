@@ -53,3 +53,11 @@
 
                        (is (= game-20-20-3
                               (game-20-20-3-id @(get-in system [:engine :games]))))))))
+
+(deftest on-tick-should-move-the-snake
+  (testing "On a tick, the snake should move one pixel into the given direction"
+    (is (= {:board  [20 20]
+            :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
+                             :direction [1 0]
+                             :speed     1.0}}} (eg/on-tick game-20-20-3))))
+   )

@@ -11,6 +11,20 @@
        (str "G_")
        (keyword)))
 
+(defn on-tick [game-state]
+  (let [pos-path [:tokens :snake :position]
+        position (get-in game-state pos-path)
+        dir (get-in game-state [:tokens :snake :direction])
+        new-head (vec (map + dir (first position)))]
+    (cond
+      ;TODO check if we run out of bounds or snake eats itself (seperate task)
+      :else (assoc-in game-state pos-path
+              (into
+                [new-head] ;the next snake head will be appended at beginning of the list
+                (vec (butlast position)))) ;the tail will be cut off
+    )
+  ))
+
 (defn new-game [width height snake-length]
   (let [game-state (b/initial-state width height snake-length)]
     {(game-id game-state) game-state}))
