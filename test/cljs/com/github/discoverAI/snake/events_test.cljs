@@ -5,9 +5,9 @@
 
 (deftest init-test
   (testing "if the initialize event is correctly handled and returnes the (for now static) state map"
-    (is (= db/default-db
-           (events/handle-init-db {} :snake.events/initialize-db)
-           )
-        )
-    )
-  )
+    (is (= {:name   "re-frame"
+            :board  [20 20]
+            :tokens {:snake {:position  [[3 5] [2 5] [1 5]]
+                             :direction [1 0]
+                             :speed     1.0}}}
+           (events/handle-init-db {} :snake.events/initialize-db)))))
