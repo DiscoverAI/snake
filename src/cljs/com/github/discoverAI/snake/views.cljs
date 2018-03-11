@@ -1,58 +1,28 @@
 (ns com.github.discoverAI.snake.views
   (:require [re-frame.core :refer [subscribe dispatch]]
-            [com.github.discoverAI.snake.subs :as subs]))
-
-(def table [:table.container])
-
-(def container-view
-  [:table.container])
-
-(def container-body
-  [:tbody])
-
-(defn row-container
-  [key]
-  [:tr {:key key}])
-
-
-(defn pos-is-snake [snake pos]
-  (boolean ((into #{} snake) pos)))
-
-(defn cell-item-for [current-pos snake]
-  (cond
-    (pos-is-snake snake current-pos)
-    [:td.snake]
-    :else
-    [:td.cell]))
-
-(defn create-row
-  [width y snake]
-  (into (row-container y)
-        (for [x (range width) :let [current-pos [x y]]]
-          (cell-item-for current-pos snake))
-        ))
-
-(defn render-board
-  [width height snake]
-  (print snake)
-  (let [cells  (for [y (range height)]
-                     (create-row width y snake))]
-    (conj container-view (into container-body cells))
-    ))
+            [com.github.discoverAI.snake.subs :as subs]
+            [com.github.discoverAI.snake.db :as db]))
 
 (defn board []
-  (let [[grid-width grid-height] @(subscribe [::subs/game-board])
-        snake @(subscribe [::subs/snake])]
-    (render-board grid-width grid-height (:position snake))))
+  [:section
+   (let [current-state @(subscribe [::subs/current-state])]
+     (cond
+       (= db/not-started current-state) [:h2 "Press \"New Game\" button to start"]))])
 
 (defn info-panel []
-  [:header "Snake"])
+  [:header
+   [:div {:class "title"} [:h1 "Snake"]]
+   (when-let [score @(subscribe [::subs/score])]
+     [:div {:class "score"} [:h1 (str score " Points")]])])
 
 (defn hints []
-  [:footer "footer"])
+  [:footer
+   (let [current-state @(subscribe [::subs/current-state])]
+     (cond
+       (= db/not-started current-state) [:a {:class "btn"} "New Game"]))])
 
 (defn base-template []
-  [:div.wrapper
+  [:div {:class "wrapper"}
    [info-panel]
-   [board]
+   [:main [board]]
    [hints]])

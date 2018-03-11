@@ -5,6 +5,7 @@
 (deftest start-game-test
   (testing "Start the game and change state with game values"
     (is (= {:board  [42 42]
+            :score  0
             :state  :started
             :tokens {:snake {:position  [[11 10] [10 10] [9 10]]
                              :direction [1 0]

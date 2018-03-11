@@ -22,7 +22,8 @@
                  [ch.qos.logback/logback-classic "1.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.5"]
-            [lein-doo "0.1.8"]]
+            [lein-doo "0.1.8"]
+            [deraen/lein-sass4clj "0.3.1"]]
   :aliases {"test-all" ["do" "test" ["doo" "once"]]}
 
   :main ^:skip-aot com.github.discoverAI.snake.core
@@ -31,11 +32,13 @@
                                   [ring/ring-mock "0.3.2"]]
                    :plugins      [[lein-figwheel "0.5.13"]
                                   [lein-release/lein-release "1.0.9"]]}}
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "resources/public/css"]
   :doo {:build "test"
         :alias {:default [:phantom]}
         :paths {:phantom ~phantomjs-bin}}
   :lein-release {:deploy-via :clojars}
+  :sass {:source-paths ["src/scss/"]
+         :target-path  "resources/public/css"}
   :figwheel {:css-dirs ["resources/public/css"]}
 
   :cljsbuild {:builds [{:id           "dev"

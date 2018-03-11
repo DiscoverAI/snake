@@ -8,6 +8,20 @@
   ::game-board
   game-board)
 
+(defn score [db]
+  (:score db))
+
+(re-frame/reg-sub
+  ::score
+  score)
+
+(defn current-state [db]
+  (:state db))
+
+(re-frame/reg-sub
+  ::current-state
+  current-state)
+
 (defn snake [db]
   (get-in db [:tokens :snake]))
 
