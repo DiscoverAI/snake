@@ -1,5 +1,6 @@
 @import "variables.scss";
 @import "button.scss";
+@import "grid.scss";
 
 body {
   color: $font-color;
@@ -71,7 +72,6 @@ main {
   clear: both;
   margin-top: $spacer;
   height: 40 * $spacer;
-  padding: $spacer;
   text-align: center;
   background: white;
   border: 1px solid $border-color;

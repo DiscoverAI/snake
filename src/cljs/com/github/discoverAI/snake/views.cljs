@@ -4,8 +4,18 @@
             [com.github.discoverAI.snake.db :as db]
             [com.github.discoverAI.snake.events :as events]))
 
+(defn board-field-class [position snake]
+  (str "field"
+       (when (some #{position} (:position snake)) " snake")))
+
 (defn board-grid []
-  [:span "asd"])
+  [:div {:class "grid-container"}
+   (let [snake @(subscribe [::subs/snake])
+         [width height] @(subscribe [::subs/game-board])]
+     (for [y (range 0 width)
+           x (range 0 height)]
+       ^{:key (str x "-" y)}
+       [:div {:class (board-field-class [x y] snake)}]))])
 
 (defn board []
   [:section

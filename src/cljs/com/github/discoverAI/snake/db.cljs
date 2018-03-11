@@ -10,9 +10,9 @@
    :tokens {}})
 
 (def mock-start-state
-  {:board  [42 42]
+  {:board  [24 24]
    :score  0
    :state  started
-   :tokens {:snake {:position  [[11 10] [10 10] [9 10]]
+   :tokens {:snake {:position  [[13 12] [12 12] [11 12]]
                     :direction [1 0]
                     :speed     1.0}}})

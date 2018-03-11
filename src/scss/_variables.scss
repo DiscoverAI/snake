@@ -25,4 +25,6 @@ $border-color: (lighten($font-color, 70));
 $yellow-400: #FFCA28;
 $yellow-800: #FF8F00;
 
-$grid-spacer: $spacer / 2;
+$grid-gap: 1px;
+$grid-gap-color: (lighten($font-color, 75));
+$grid-field-size: 1.5em;
