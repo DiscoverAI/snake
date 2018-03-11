@@ -1,4 +1,3 @@
 (ns com.github.discoverAI.snake.config)
 
-(def debug?
-  ^boolean goog.DEBUG)
+(def debug? ^boolean goog.DEBUG)

@@ -1,0 +1,30 @@
+$spacer: 1rem;
+
+$body-bg: #f8f8f8;
+
+$font-color: #212529;
+$font-family: Arial, sans-serif;
+$font-size-base: 1rem;
+$font-weight-normal: 400;
+$line-height-base: 1.5;
+
+$font-weight-base: $font-weight-normal;
+
+$h1-font-size: $font-size-base * 2.5;
+$h2-font-size: $font-size-base * 2;
+$h3-font-size: $font-size-base * 1.75;
+$h4-font-size: $font-size-base * 1.5;
+$h5-font-size: $font-size-base * 1.25;
+$h6-font-size: $font-size-base;
+
+$headings-margin-bottom: ($spacer / 2);
+$headings-font-weight: 500;
+$headings-line-height: 1.2;
+
+$border-color: (lighten($font-color, 70));
+$yellow-400: #FFCA28;
+$yellow-800: #FF8F00;
+
+$grid-gap: 1px;
+$grid-gap-color: (lighten($font-color, 75));
+$grid-field-size: 1.5em;

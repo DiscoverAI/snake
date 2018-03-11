@@ -15,3 +15,4 @@ pom.xml.asc
 *.iml
 /figwheel_server.log
 /resources/public/js/compiled
+/resources/public/css/
