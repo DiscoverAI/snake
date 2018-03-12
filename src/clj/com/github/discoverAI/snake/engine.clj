@@ -11,19 +11,21 @@
        (str "G_")
        (keyword)))
 
+(defn vector-addition
+  [first second]
+  (vec (map + first second)))
+
 (defn on-tick [game-state]
-  (let [pos-path [:tokens :snake :position]
-        position (get-in game-state pos-path)
-        dir (get-in game-state [:tokens :snake :direction])
-        new-head (vec (map + dir (first position)))]
+  (let [snake-path [:tokens :snake :position]
+        snake (get-in game-state snake-path)
+        direction (get-in game-state [:tokens :snake :direction])
+        new-head (vector-addition direction (first snake))]
     (cond
       ;TODO check if we run out of bounds or snake eats itself (seperate task)
-      :else (assoc-in game-state pos-path
-              (into
-                [new-head] ;the next snake head will be appended at beginning of the list
-                (vec (butlast position)))) ;the tail will be cut off
-    )
-  ))
+      :else (assoc-in game-state snake-path
+                      (into
+                        [new-head]
+                        (vec (butlast snake)))))))
 
 (defn new-game [width height snake-length]
   (let [game-state (b/initial-state width height snake-length)]

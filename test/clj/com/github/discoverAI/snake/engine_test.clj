@@ -54,6 +54,12 @@
                        (is (= game-20-20-3
                               (game-20-20-3-id @(get-in system [:engine :games]))))))))
 
+(deftest test-vector-add
+  (testing "On a tick, the snake should move one pixel into the given direction"
+    (is (= [1 4] (eg/vector-addition [1 2] [0 2])))
+    )
+  )
+
 (deftest on-tick-should-move-the-snake
   (testing "On a tick, the snake should move one pixel into the given direction"
     (is (= {:board  [20 20]
