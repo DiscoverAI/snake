@@ -3,13 +3,19 @@
             [com.stuartsierra.component :as c]
             [com.github.discoverAI.snake.board :as b]
             [de.otto.status :as st]
-            [de.otto.tesla.stateful.app-status :as as]))
+            [de.otto.tesla.stateful.app-status :as as]
+            [overtone.at-at :as ot]
+            [de.otto.tesla.stateful.scheduler :as sch]))
 
 (defn game-id [game-state]
   (->> (hash game-state)
        (+ (System/nanoTime))
        (str "G_")
        (keyword)))
+
+(defn new-game [width height snake-length]
+  (let [game-state (b/initial-state width height snake-length)]
+    {(game-id game-state) game-state}))
 
 (defn vector-addition
   [first second]
@@ -27,14 +33,29 @@
                         [new-head]
                         (vec (butlast snake)))))))
 
-(defn new-game [width height snake-length]
-  (let [game-state (b/initial-state width height snake-length)]
-    {(game-id game-state) game-state}))
+(defrecord Scheduler []
+  sch/SchedulerPool
+  (pool [_self]
+    (ot/mk-pool)))
+
+(defn new-scheduler []
+  (map->Scheduler {}))
+
+(defn atomically-update-game-state
+  [games id]
+  (swap! games merge (on-tick (get-in @games [id]))))
+
+(defn register-tick-dispatch
+  [scheduler games game-id]
+  (overtone.at-at/every 1000 #(atomically-update-game-state games game-id)
+                        (de.otto.tesla.stateful.scheduler/pool scheduler) :desc "UpdateGameStateTask"))
 
 (defn register-new-game [{:keys [games]} width height snake-length]
-  (let [game (new-game width height snake-length)]
+  (let [game (new-game width height snake-length)
+        id (first (keys game))]
     (swap! games merge game)
-    (first (keys game))))
+    (register-tick-dispatch (new-scheduler) games id)
+    id))
 
 (defn games-state-status [games-state-atom]
   (if (and (map? @games-state-atom) (<= 0 (count @games-state-atom)))
