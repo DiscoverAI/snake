@@ -11,7 +11,7 @@
 (defn snake-system [runtime-config]
   (-> (system/base-system runtime-config)
       (assoc
-        :engine (c/using (eg/new-engine) [:app-status])
+        :engine (c/using (eg/new-engine) [:app-status :scheduler])
         :endpoint (c/using (ep/new-endpoint) [:handler :engine]))
       (httpkit/add-server :endpoint)))
 

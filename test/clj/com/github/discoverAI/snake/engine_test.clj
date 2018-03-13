@@ -67,3 +67,11 @@
                              :direction [1 0]
                              :speed     1.0}}} (eg/on-tick game-20-20-3))))
    )
+
+(deftest atomically-update-game-state
+  (testing "If the game state is updated"
+    (let [atom (atom {game-20-20-3-id game-20-20-3})]
+      (eg/atomically-update-game-state atom)
+      (is (= @atom {game-20-20-3-id (eg/on-tick  game-20-20-3)})
+      )
+    )))

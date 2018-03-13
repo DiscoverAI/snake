@@ -33,28 +33,15 @@
                         [new-head]
                         (vec (butlast snake)))))))
 
-(defrecord Scheduler []
-  sch/SchedulerPool
-  (pool [_self]
-    (ot/mk-pool)))
-
-(defn new-scheduler []
-  (map->Scheduler {}))
-
 (defn atomically-update-game-state
-  [games id]
-  (swap! games merge (on-tick (get-in @games [id]))))
-
-(defn register-tick-dispatch
-  [scheduler games game-id]
-  (overtone.at-at/every 1000 #(atomically-update-game-state games game-id)
-                        (de.otto.tesla.stateful.scheduler/pool scheduler) :desc "UpdateGameStateTask"))
+  [games]
+  (doseq [[game-id _game] @games]
+    (swap! games update game-id on-tick)))
 
 (defn register-new-game [{:keys [games]} width height snake-length]
   (let [game (new-game width height snake-length)
         id (first (keys game))]
     (swap! games merge game)
-    (register-tick-dispatch (new-scheduler) games id)
     id))
 
 (defn games-state-status [games-state-atom]
@@ -62,12 +49,14 @@
     (st/status-detail :engine :ok (str (count @games-state-atom) " games registered"))
     (st/status-detail :engine :error "Engines games are corrupt")))
 
-(defrecord Engine [app-status]
+(defrecord Engine [app-status scheduler]
   c/Lifecycle
   (start [self]
     (log/info "-> starting Engine")
     (let [games-state (atom {})]
       (as/register-status-fun app-status (partial games-state-status games-state))
+      (overtone.at-at/every 1000 #(atomically-update-game-state (:games self))
+                            (de.otto.tesla.stateful.scheduler/pool scheduler) :desc "UpdateGameStateTask")
       (assoc self :games games-state)))
   (stop [_]
     (log/info "<- stopping Engine")))
