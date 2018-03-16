@@ -10,8 +10,8 @@
    :tokens {:snake {:position  [[11 10] [10 10] [9 10]]
                     :direction [1 0]
                     :speed     1.0}}})
-(def game-20-20-3-id
-  :foobar)
+
+(def game-20-20-3-id :foobar)
 
 (deftest game-id-test
   (testing "Should calculate a unique game id"
@@ -56,22 +56,17 @@
 
 (deftest test-vector-add
   (testing "On a tick, the snake should move one pixel into the given direction"
-    (is (= [1 4] (eg/vector-addition [1 2] [0 2])))
-    )
-  )
+    (is (= [1 4] (eg/vector-addition [1 2] [0 2])))))
 
 (deftest on-tick-should-move-the-snake
   (testing "On a tick, the snake should move one pixel into the given direction"
     (is (= {:board  [20 20]
             :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
                              :direction [1 0]
-                             :speed     1.0}}} (eg/on-tick game-20-20-3))))
-   )
+                             :speed     1.0}}} (eg/move game-20-20-3)))))
 
 (deftest atomically-update-game-state
   (testing "If the game state is updated"
     (let [atom (atom {game-20-20-3-id game-20-20-3})]
       (eg/atomically-update-game-state atom)
-      (is (= @atom {game-20-20-3-id (eg/on-tick  game-20-20-3)})
-      )
-    )))
+      (is (= @atom {game-20-20-3-id (eg/move game-20-20-3)})))))

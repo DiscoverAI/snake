@@ -21,7 +21,7 @@
   [first second]
   (vec (map + first second)))
 
-(defn on-tick [game-state]
+(defn move [game-state]
   (let [snake-path [:tokens :snake :position]
         snake (get-in game-state snake-path)
         direction (get-in game-state [:tokens :snake :direction])
@@ -36,11 +36,13 @@
 (defn atomically-update-game-state
   [games]
   (doseq [[game-id _game] @games]
-    (swap! games update game-id on-tick)))
+    (swap! games update game-id move)))
 
-(defn register-new-game [{:keys [games]} width height snake-length]
+(defn register-new-game [{:keys [games scheduler]} width height snake-length]
   (let [game (new-game width height snake-length)
         id (first (keys game))]
+    (overtone.at-at/every 1000 #(atomically-update-game-state games)
+                          (de.otto.tesla.stateful.scheduler/pool scheduler) :desc "UpdateGameStateTask")
     (swap! games merge game)
     id))
 
@@ -55,8 +57,6 @@
     (log/info "-> starting Engine")
     (let [games-state (atom {})]
       (as/register-status-fun app-status (partial games-state-status games-state))
-      (overtone.at-at/every 1000 #(atomically-update-game-state (:games self))
-                            (de.otto.tesla.stateful.scheduler/pool scheduler) :desc "UpdateGameStateTask")
       (assoc self :games games-state)))
   (stop [_]
     (log/info "<- stopping Engine")))
