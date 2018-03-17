@@ -3,9 +3,7 @@
             [de.otto.tesla.util.test-utils :as tu]
             [com.github.discoverAI.snake.core :as co]
             [com.github.discoverAI.snake.engine :as eg]
-            [clojure.string :as s]
-            [de.otto.tesla.stateful.scheduler :as sch]
-            [overtone.at-at :as ot]))
+            [clojure.string :as s]))
 
 (def game-20-20-3
   {:board  [20 20]
