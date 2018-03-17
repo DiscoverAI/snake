@@ -70,9 +70,9 @@
 
 (deftest atomically-update-game-state
   (testing "If the game state is updated"
-    (let [atom (atom {game-20-20-3-id game-20-20-3})]
+    (let [atom (atom {game-20-20-3-id game-20-20-3 :foobazz game-20-20-3})]
       (eg/atomically-update-game-state atom game-20-20-3-id)
-      (is (= @atom {game-20-20-3-id (eg/move game-20-20-3)})))))
+      (is (= @atom {game-20-20-3-id (eg/move game-20-20-3) :foobazz game-20-20-3})))))
 
 (deftest test-scheduling
   (testing "if the move is scheduled"
