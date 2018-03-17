@@ -35,25 +35,21 @@
                         [new-head]
                         (vec (butlast snake)))))))
 
-
-
-
 (defn atomically-update-game-state
-  [games]
-  (doseq [[game-id _game] @games]
-    (swap! games update game-id move)))
+  [games game-id]
+  (swap! games update game-id move))
 
 (defn register-move-dispatch
-  [games scheduler]
-  (overtone.at-at/every 1000
-                        #(atomically-update-game-state games)
+  [games game-id scheduler]
+  (overtone.at-at/every move-speed
+                        #(atomically-update-game-state games game-id)
                         (de.otto.tesla.stateful.scheduler/pool scheduler)
                         :desc "UpdateGameStateTask"))
 
 (defn register-new-game [{:keys [games scheduler]} width height snake-length]
   (let [game (new-game width height snake-length)
         id (first (keys game))]
-    (register-move-dispatch games scheduler)
+    (register-move-dispatch games id scheduler)
     (swap! games merge game)
     id))
 

@@ -46,7 +46,7 @@
                                (is (= game-20-20-3
                                       game-state))
                                game-20-20-3-id)
-                  eg/register-move-dispatch (fn [_ _])]
+                  eg/register-move-dispatch (fn [_ _ _])]
       (tu/with-started [system (co/snake-system {})]
                        (is (not= nil
                                  (:engine system)))
@@ -71,16 +71,16 @@
 (deftest atomically-update-game-state
   (testing "If the game state is updated"
     (let [atom (atom {game-20-20-3-id game-20-20-3})]
-      (eg/atomically-update-game-state atom)
+      (eg/atomically-update-game-state atom game-20-20-3-id)
       (is (= @atom {game-20-20-3-id (eg/move game-20-20-3)})))))
 
 (deftest test-scheduling
   (testing "if the move is scheduled"
     (with-redefs
       [eg/atomically-update-game-state
-       (fn [c] (swap! c inc))]
+       (fn [a _] (swap! a inc))]
       (tu/with-started [system (co/snake-system {})]
                        (let [a (atom 0)]
-                         (eg/register-move-dispatch a (:scheduler system))
+                         (eg/register-move-dispatch a :mock-id (:scheduler system))
                          (Thread/sleep (+ eg/move-speed 50))
                          (is (= @a 2)))))))
