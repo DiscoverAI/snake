@@ -21,6 +21,8 @@
   [first second]
   (vec (map + first second)))
 
+(def move-speed 1000)
+
 (defn move [game-state]
   (let [snake-path [:tokens :snake :position]
         snake (get-in game-state snake-path)
@@ -33,16 +35,25 @@
                         [new-head]
                         (vec (butlast snake)))))))
 
+
+
+
 (defn atomically-update-game-state
   [games]
   (doseq [[game-id _game] @games]
     (swap! games update game-id move)))
 
+(defn register-move-dispatch
+  [games scheduler]
+  (overtone.at-at/every 1000
+                        #(atomically-update-game-state games)
+                        (de.otto.tesla.stateful.scheduler/pool scheduler)
+                        :desc "UpdateGameStateTask"))
+
 (defn register-new-game [{:keys [games scheduler]} width height snake-length]
   (let [game (new-game width height snake-length)
         id (first (keys game))]
-    (overtone.at-at/every 1000 #(atomically-update-game-state games)
-                          (de.otto.tesla.stateful.scheduler/pool scheduler) :desc "UpdateGameStateTask")
+    (register-move-dispatch games scheduler)
     (swap! games merge game)
     id))
 

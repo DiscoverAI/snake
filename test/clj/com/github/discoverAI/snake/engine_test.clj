@@ -3,7 +3,9 @@
             [de.otto.tesla.util.test-utils :as tu]
             [com.github.discoverAI.snake.core :as co]
             [com.github.discoverAI.snake.engine :as eg]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [de.otto.tesla.stateful.scheduler :as sch]
+            [overtone.at-at :as ot]))
 
 (def game-20-20-3
   {:board  [20 20]
@@ -43,7 +45,8 @@
     (with-redefs [eg/game-id (fn [game-state]
                                (is (= game-20-20-3
                                       game-state))
-                               game-20-20-3-id)]
+                               game-20-20-3-id)
+                  eg/register-move-dispatch (fn [_ _])]
       (tu/with-started [system (co/snake-system {})]
                        (is (not= nil
                                  (:engine system)))
@@ -70,3 +73,14 @@
     (let [atom (atom {game-20-20-3-id game-20-20-3})]
       (eg/atomically-update-game-state atom)
       (is (= @atom {game-20-20-3-id (eg/move game-20-20-3)})))))
+
+(deftest test-scheduling
+  (testing "if the move is scheduled"
+    (with-redefs
+      [eg/atomically-update-game-state
+       (fn [c] (swap! c inc))]
+      (tu/with-started [system (co/snake-system {})]
+                       (let [a (atom 0)]
+                         (eg/register-move-dispatch a (:scheduler system))
+                         (Thread/sleep (+ eg/move-speed 50))
+                         (is (= @a 2)))))))
