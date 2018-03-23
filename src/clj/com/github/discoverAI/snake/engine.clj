@@ -17,8 +17,7 @@
   (let [game-state (b/initial-state width height snake-length)]
     {(game-id game-state) game-state}))
 
-(defn vector-addition
-  [first second]
+(defn vector-addition [first second]
   (vec (map + first second)))
 
 (def MOVE_UPDATE_INTERVAL 1000)
