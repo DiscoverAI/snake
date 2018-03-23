@@ -4,8 +4,8 @@
             [com.github.discoverAI.snake.board :as b]
             [de.otto.status :as st]
             [de.otto.tesla.stateful.app-status :as as]
-            [overtone.at-at :as ot]
-            [de.otto.tesla.stateful.scheduler :as sch]))
+            [overtone.at-at :as at-at]
+            [de.otto.tesla.stateful.scheduler :as scheduler]))
 
 (defn game-id [game-state]
   (->> (hash game-state)
@@ -21,7 +21,7 @@
   [first second]
   (vec (map + first second)))
 
-(def move-speed 1000)
+(def MOVE_UPDATE_INTERVAL 1000)
 
 (defn move [game-state]
   (let [snake-path [:tokens :snake :position]
@@ -35,22 +35,14 @@
                         [new-head]
                         (vec (butlast snake)))))))
 
-(defn atomically-update-game-state
-  [games game-id]
-  (swap! games update game-id move))
-
-(defn register-move-dispatch
-  [games game-id scheduler]
-  (overtone.at-at/every move-speed
-                        #(atomically-update-game-state games game-id)
-                        (de.otto.tesla.stateful.scheduler/pool scheduler)
-                        :desc "UpdateGameStateTask"))
-
 (defn register-new-game [{:keys [games scheduler]} width height snake-length]
   (let [game (new-game width height snake-length)
         id (first (keys game))]
-    (register-move-dispatch games id scheduler)
     (swap! games merge game)
+    (at-at/every MOVE_UPDATE_INTERVAL
+                 #(swap! games update id move)
+                 (scheduler/pool scheduler)
+                 :desc "UpdateGameStateTask")
     id))
 
 (defn games-state-status [games-state-atom]

@@ -39,46 +39,36 @@
                 (eg/new-game 21 19 7))))))
 
 (deftest register-new-game-test
-  (testing "Should add a new game to component"
-    (with-redefs [eg/game-id (fn [game-state]
-                               (is (= game-20-20-3
-                                      game-state))
-                               game-20-20-3-id)
-                  eg/register-move-dispatch (fn [_ _ _])]
-      (tu/with-started [system (co/snake-system {})]
-                       (is (not= nil
-                                 (:engine system)))
+  (testing "Should add a new game to component and register move function with scheduler"
+    (let [moved? (atom false)]
+      (with-redefs [eg/game-id (fn [game-state]
+                                 (is (= game-20-20-3 game-state))
+                                 game-20-20-3-id)
+                    eg/move (fn [game-state]
+                              (is (= game-20-20-3 game-state))
+                              (reset! moved? true)
+                              game-state)]
+        (tu/with-started [system (co/snake-system {})]
+                         (is (not= nil
+                                   (:engine system)))
 
-                       (is (= game-20-20-3-id
-                              (eg/register-new-game (:engine system) 20 20 3)))
+                         (is (= game-20-20-3-id
+                                (eg/register-new-game (:engine system) 20 20 3)))
 
-                       (is (= game-20-20-3
-                              (game-20-20-3-id @(get-in system [:engine :games]))))))))
+                         (is (= game-20-20-3
+                                (game-20-20-3-id @(get-in system [:engine :games]))))
+
+                         (tu/eventually (is (= true @moved?))))))))
 
 (deftest test-vector-add
   (testing "On a tick, the snake should move one pixel into the given direction"
-    (is (= [1 4] (eg/vector-addition [1 2] [0 2])))))
+    (is (= [1 4]
+           (eg/vector-addition [1 2] [0 2])))))
 
-(deftest on-tick-should-move-the-snake
-  (testing "On a tick, the snake should move one pixel into the given direction"
+(deftest move-the-snake
+  (testing "move snake one pixel into the given direction"
     (is (= {:board  [20 20]
             :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
                              :direction [1 0]
-                             :speed     1.0}}} (eg/move game-20-20-3)))))
-
-(deftest atomically-update-game-state
-  (testing "If the game state is updated"
-    (let [atom (atom {game-20-20-3-id game-20-20-3 :foobazz game-20-20-3})]
-      (eg/atomically-update-game-state atom game-20-20-3-id)
-      (is (= @atom {game-20-20-3-id (eg/move game-20-20-3) :foobazz game-20-20-3})))))
-
-(deftest test-scheduling
-  (testing "if the move is scheduled"
-    (with-redefs
-      [eg/atomically-update-game-state
-       (fn [a _] (swap! a inc))]
-      (tu/with-started [system (co/snake-system {})]
-                       (let [a (atom 0)]
-                         (eg/register-move-dispatch a :mock-id (:scheduler system))
-                         (Thread/sleep (+ eg/move-speed 50))
-                         (is (= @a 2)))))))
+                             :speed     1.0}}}
+           (eg/move game-20-20-3)))))
