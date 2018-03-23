@@ -22,17 +22,14 @@
 
 (def MOVE_UPDATE_INTERVAL 1000)
 
+(defn move-snake [{:keys [direction] :as snake}]
+  (update snake :position
+          (fn [snake-position]
+            (concat [(vector-addition (first snake-position) direction)]
+                    (drop-last snake-position)))))
+
 (defn move [game-state]
-  (let [snake-path [:tokens :snake :position]
-        snake (get-in game-state snake-path)
-        direction (get-in game-state [:tokens :snake :direction])
-        new-head (vector-addition direction (first snake))]
-    (cond
-      ;TODO check if we run out of bounds or snake eats itself (seperate task)
-      :else (assoc-in game-state snake-path
-                      (into
-                        [new-head]
-                        (vec (butlast snake)))))))
+  (update-in game-state [:tokens :snake] move-snake))
 
 (defn register-new-game [{:keys [games scheduler]} width height snake-length]
   (let [game (new-game width height snake-length)
