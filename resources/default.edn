@@ -1,2 +1,3 @@
 {:server-port #ts/env [:port "8080"]
- :metrics     {:prometheus {:metrics-path "/metrics"}}}
+ :metrics     {:prometheus {:metrics-path "/metrics"}}
+ :scheduler   {:cpu-count 2}}
