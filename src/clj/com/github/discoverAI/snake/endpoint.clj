@@ -25,6 +25,12 @@
   (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
   (def connected-uids connected-uids))                       ; Watchable, read-only atom
 
+(defn event-msg-handler
+  [{:as ev-msg :keys [id ?data event]}]
+  (println ?data))
+
+(sente/start-server-chsk-router!
+  ch-chsk event-msg-handler)
 
 (defn endpoint-filter [handler]
   (cc/routes
