@@ -25,12 +25,23 @@
   (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
   (def connected-uids connected-uids))                       ; Watchable, read-only atom
 
-(defn event-msg-handler
-  [{:as ev-msg :keys [id ?data event]}]
-  (println ?data))
+(defmulti -event-msg-handler :id)
 
-(sente/start-server-chsk-router!
-  ch-chsk event-msg-handler)
+(defn event-msg-handler
+  [engine {:as ev-msg}]
+  (-event-msg-handler ev-msg engine))
+
+(defmethod -event-msg-handler
+  :default
+  [{:keys [event]} _engine]
+  (log/debug "Unhandled event: " event))
+
+(defmethod -event-msg-handler :com.github.discoverAI.snake.events/key-pressed
+  [{:keys [?data]} {:keys [games]}]
+  (println "Switch direction: " ?data)
+  ; TODO update games here! For that the game id is needed.
+  ?data)
+
 
 (defn endpoint-filter [handler]
   (cc/routes
@@ -51,6 +62,7 @@
   (start [self]
     (log/info "-> starting Endpoint")
     (handler/register-handler handler (create-routes self))
+    (sente/start-server-chsk-router! ch-chsk (fn [event] (event-msg-handler engine event)))
     self)
   (stop [_]
     (log/info "<- stopping Endpoint")))

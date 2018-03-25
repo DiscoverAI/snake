@@ -3,11 +3,12 @@
             [com.github.discoverAI.snake.db :as db]
             [com.github.discoverAI.snake.core :as core]))
 
-(def ARROW_KEY_CODES [37 38 39 40])
+(def ARROW_KEY_CODES {37 :left
+                      39 :right})
 
 (defn key-pressed [event]
-  (if (some #{(.-keyCode event)} ARROW_KEY_CODES)
-    (core/chsk-send! [::key-pressed {:id (.-keyCode event)}])))
+  (if (some #{(.-keyCode event)} (keys ARROW_KEY_CODES))
+    (core/chsk-send! [::key-pressed {:direction (get ARROW_KEY_CODES (.-keyCode event))}])))
 
 (re-frame/reg-event-db
   ::initialize-db
