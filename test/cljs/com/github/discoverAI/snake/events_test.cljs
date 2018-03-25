@@ -10,4 +10,5 @@
             :tokens {:snake {:position  [[13 12] [12 12] [11 12]]
                              :direction [1 0]
                              :speed     1}}}
-           (events/start-state {} [:start-game])))))
+           (with-redefs [events/init-new-game (fn [])]
+                        (events/start-game {} [:start-game]))))))

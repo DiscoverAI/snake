@@ -11,7 +11,7 @@
     ;TODO: Like this the test just checks if the right method is dispatched.
     (tu/with-started [system (co/snake-system {})]
                      (is (= (e/event-msg-handler (:engine system)
-                                                 {:id :com.github.discoverAI.snake.events/key-pressed
-                                                  :event [:com.github.discoverAI.snake.events/key-pressed {:direction :right}]
+                                                 {:id :com.github.discoverAI.snake.communication/key-pressed
+                                                  :event [:com.github.discoverAI.snake.communication/key-pressed {:direction :right}]
                                                   :?data {:direction :right},})
                             {:direction :right})))))
