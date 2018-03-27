@@ -38,18 +38,10 @@
   (log/debug "Unhandled event: " event))
 
 (defmethod -event-msg-handler
-  :com.github.discoverAI.snake.communication/key-pressed
+  ::key-pressed
   [{:keys [?data]} {:keys [games]}]
-  (println "Switch direction: " ?data)
-  ; TODO update games here! For that the game id is needed.
-  ?data)
-
-(defmethod -event-msg-handler
-  :com.github.discoverAI.snake.communication/register-game
-  [{:keys [?data]} engine]
-  (println "Register with data:" ?data)
-  (let [id (eg/register-new-game engine 20 20 3)])
-  ; TODO Send ID back to client
+  (log/info "Switch direction: " (:direction ?data))
+  ;TODO update games here! For that the game id is needed.
   ?data)
 
 (defn endpoint-filter [handler]
