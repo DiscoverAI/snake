@@ -10,11 +10,11 @@
   (fn [_ _]
     db/default-db))
 
-(defn init-new-game []
+(defn attach-on-key-listener []
   (set! (.-onkeydown js/window) key-pressed))
 
 (defn start-game [_db _event]
-  (init-new-game)
+  (attach-on-key-listener)
   db/mock-start-state)
 
 (re-frame/reg-event-db

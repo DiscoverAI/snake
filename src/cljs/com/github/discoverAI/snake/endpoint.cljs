@@ -18,5 +18,7 @@
                       39 :right})
 
 (defn send-key-pressed [keycode]
+  (print "send key pressed")
   (if (some #{keycode} (keys ARROW_KEY_CODES))
+    (print "send key pressed" keycode)
     (chsk-send! [::key-pressed {:direction (get ARROW_KEY_CODES keycode)}])))
