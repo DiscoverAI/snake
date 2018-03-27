@@ -3,8 +3,7 @@
             [re-frame.core :as re-frame]
             [com.github.discoverAI.snake.events :as events]
             [com.github.discoverAI.snake.views :as views]
-            [com.github.discoverAI.snake.config :as config]
-            [com.github.discoverAI.snake.endpoint :as c]))
+            [com.github.discoverAI.snake.config :as config]))
 
 (defn dev-setup []
   (when config/debug?

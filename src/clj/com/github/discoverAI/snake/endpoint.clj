@@ -8,8 +8,7 @@
             [de.otto.goo.goo :as metrics]
             [compojure.core :as cc]
             [taoensso.sente :as sente]
-            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
-            [com.github.discoverAI.snake.engine :as eg]))
+            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]))
 
 (defn response [{:keys [engine]} _]
   (if (= 0 (count @(:games engine)))

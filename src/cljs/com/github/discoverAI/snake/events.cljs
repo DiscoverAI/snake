@@ -1,9 +1,9 @@
 (ns com.github.discoverAI.snake.events
   (:require [re-frame.core :as re-frame]
             [com.github.discoverAI.snake.db :as db]
-            [com.github.discoverAI.snake.endpoint :as c]))
+            [com.github.discoverAI.snake.endpoint :as ep]))
 
-(defn key-pressed [event] (c/send-key-pressed (.-keyCode event)))
+(defn key-pressed [event] (ep/send-key-pressed (.-keyCode event)))
 
 (re-frame/reg-event-db
   ::initialize-db
