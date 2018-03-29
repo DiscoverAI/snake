@@ -8,7 +8,8 @@
             [de.otto.goo.goo :as metrics]
             [compojure.core :as cc]
             [taoensso.sente :as sente]
-            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]))
+            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
+            [com.github.discoverAI.snake.engine :as eg]))
 
 (defn response [{:keys [engine]} _]
   (if (= 0 (count @(:games engine)))
@@ -25,6 +26,21 @@
   (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
   (def connected-uids connected-uids))                       ; Watchable, read-only atom
 
+(defmulti -event-msg-handler :id)
+
+(defn event-msg-handler
+  [engine {:as ev-msg}]
+  (-event-msg-handler ev-msg engine))
+
+(defmethod -event-msg-handler
+  :default
+  [{:keys [event]} _engine]
+  (log/debug "Unhandled event: " event))
+
+(defmethod -event-msg-handler
+  ::key-pressed
+  [{:keys [?data]} {:keys [games]}]
+  (eg/change-direction games :mocked-game-id (:direction ?data)))
 
 (defn endpoint-filter [handler]
   (cc/routes
@@ -45,6 +61,7 @@
   (start [self]
     (log/info "-> starting Endpoint")
     (handler/register-handler handler (create-routes self))
+    (sente/start-server-chsk-router! ch-chsk (fn [event] (event-msg-handler engine event)))
     self)
   (stop [_]
     (log/info "<- stopping Endpoint")))

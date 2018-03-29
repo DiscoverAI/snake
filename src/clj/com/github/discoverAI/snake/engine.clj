@@ -31,6 +31,9 @@
 (defn move [game-state]
   (update-in game-state [:tokens :snake] move-snake))
 
+(defn change-direction [{:keys [games scheduler]} game-id direction]
+  (log/info "Change direction: " direction))
+
 (defn register-new-game [{:keys [games scheduler]} width height snake-length]
   (let [game (new-game width height snake-length)
         id (first (keys game))]
