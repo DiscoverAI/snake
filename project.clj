@@ -1,6 +1,8 @@
 (def phantomjs-bin (or (System/getenv "PHANTOMJSBIN")
                      "./dev-resources/phantomjs-2.1.1-linux-x86_64"))
 
+(def java-opts (if (= (System/getProperty "java.version") "10") ["--add-modules" "java.xml.bind"] []))
+
 (defproject com.github.discoverAI/snake "0.1.0-SNAPSHOT"
   :description "A Clojure/ClojureScript Snake game for your browser"
   :url "https://github.com/DiscoverAI/snake"
@@ -10,6 +12,7 @@
 
   :min-lein-version "2.5.3"
   :test-paths ["test/clj" "test/cljs"]
+	:jvm-opts ~java-opts
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.145"]
