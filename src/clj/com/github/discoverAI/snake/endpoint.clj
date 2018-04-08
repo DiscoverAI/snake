@@ -7,10 +7,9 @@
             [ring.middleware.keyword-params :as kparams]
             [de.otto.goo.goo :as metrics]
             [compojure.core :as cc]
-            [taoensso.sente :as sente]
-            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
-            [com.github.discoverAI.snake.engine :as eg]
-            [com.github.discoverAI.snake.websocket :as ws]))
+            [com.github.discoverAI.snake.websocket-config :as ws-config]
+            [com.github.discoverAI.snake.websocket-api :as ws-api]
+            [taoensso.sente :as sente]))
 
 (defn response [{:keys [engine]} _]
   (if (= 0 (count @(:games engine)))
@@ -19,36 +18,12 @@
      :headers {"content-type" "application/json"}
      :body    (json/write-str @(:games engine))}))
 
-(let [{:keys [ch-recv send-fn connected-uids ajax-post-fn ajax-get-or-ws-handshake-fn]}
-      (sente/make-channel-socket! (get-sch-adapter) {})]
-  (def ring-ajax-post ajax-post-fn)
-  (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-  (def ch-chsk ch-recv)                                     ; ChannelSocket's receive channel
-  (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
-  (def connected-uids connected-uids))                      ; Watchable, read-only atom
-
-(defmulti -event-msg-handler :id)
-
-(defn event-msg-handler
-  [engine {:as ev-msg}]
-  (-event-msg-handler ev-msg engine))
-
-(defmethod -event-msg-handler
-  :default
-  [{:keys [event]} _engine]
-  (log/debug "Unhandled event: " event))
-
-(defmethod -event-msg-handler
-  ::key-pressed
-  [{:keys [?data]} {:keys [games]}]
-  (eg/change-direction games :mocked-game-id (:direction ?data)))
-
 (defn endpoint-filter [handler]
   (cc/routes
     (cc/GET "/games" req (handler req))
     (cc/GET "/games/" req (handler req))
-    (cc/GET ws/INIT_ROUTE req (ring-ajax-get-or-ws-handshake req))
-    (cc/POST ws/INIT_ROUTE req (ring-ajax-post req))))
+    (cc/GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
+    (cc/POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))
 
 (defn create-routes [self]
   (->> (partial response self)
@@ -62,7 +37,7 @@
   (start [self]
     (log/info "-> starting Endpoint")
     (handler/register-handler handler (create-routes self))
-    (sente/start-server-chsk-router! ch-chsk (fn [event] (event-msg-handler engine event)))
+    (sente/start-server-chsk-router! ws-api/ch-chsk (fn [event] (ws-api/event-msg-handler engine event)))
     self)
   (stop [_]
     (log/info "<- stopping Endpoint")))

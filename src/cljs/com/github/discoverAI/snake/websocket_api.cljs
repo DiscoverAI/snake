@@ -1,5 +1,6 @@
-(ns com.github.discoverAI.snake.backend-api
-  (:require [com.github.discoverAI.snake.websocket :as ws]
+(ns com.github.discoverAI.snake.websocket-api
+  (:require [com.github.discoverAI.snake.websocket-config :as ws]
+
             [taoensso.sente :as sente]))
 
 (let [{:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket! ws/INIT_ROUTE ws/CLIENT_CONFIG)]
