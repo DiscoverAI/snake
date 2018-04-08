@@ -14,9 +14,8 @@
 
 (defmulti -event-msg-handler :id)
 
-(defn event-msg-handler
-  [engine {:as ev-msg}]
-  (-event-msg-handler ev-msg engine))
+(defn event-msg-handler [engine {:as event-message}]
+  (-event-msg-handler event-message engine))
 
 (defmethod -event-msg-handler
   :default
