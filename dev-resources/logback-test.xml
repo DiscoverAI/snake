@@ -16,9 +16,9 @@
 
     </appender>
 
-    <logger name="snake-backend" level="info"/>
+    <logger name="snake-backend" level="debug"/>
 
-    <root level="${log_level:-info}">
+    <root level="${log_level:-debug}">
         <appender-ref ref="${log_appender:-consoleAppender}"/>
     </root>
 
