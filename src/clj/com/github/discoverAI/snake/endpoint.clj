@@ -9,7 +9,8 @@
             [compojure.core :as cc]
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
-            [com.github.discoverAI.snake.engine :as eg]))
+            [com.github.discoverAI.snake.engine :as eg]
+            [com.github.discoverAI.snake.websocket :as ws]))
 
 (defn response [{:keys [engine]} _]
   (if (= 0 (count @(:games engine)))
@@ -24,7 +25,7 @@
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
   (def ch-chsk ch-recv)                                     ; ChannelSocket's receive channel
   (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
-  (def connected-uids connected-uids))                       ; Watchable, read-only atom
+  (def connected-uids connected-uids))                      ; Watchable, read-only atom
 
 (defmulti -event-msg-handler :id)
 
@@ -46,8 +47,8 @@
   (cc/routes
     (cc/GET "/games" req (handler req))
     (cc/GET "/games/" req (handler req))
-    (cc/GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
-    (cc/POST "/chsk" req (ring-ajax-post req))))
+    (cc/GET ws/INIT_ROUTE req (ring-ajax-get-or-ws-handshake req))
+    (cc/POST ws/INIT_ROUTE req (ring-ajax-post req))))
 
 (defn create-routes [self]
   (->> (partial response self)

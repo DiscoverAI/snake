@@ -27,7 +27,7 @@
   :aliases {"test-all" ["do" "test" ["doo" "once"]]}
 
   :main ^:skip-aot com.github.discoverAI.snake.core
-  :source-paths ["src/clj"]
+  :source-paths ["src/cljc" "src/clj/"]
   :profiles {:dev {:dependencies [[binaryage/devtools "0.9.9"]
                                   [ring/ring-mock "0.3.2"]]
                    :plugins      [[lein-figwheel "0.5.13"]

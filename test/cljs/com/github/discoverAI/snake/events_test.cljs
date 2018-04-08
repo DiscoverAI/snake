@@ -4,11 +4,11 @@
 
 (deftest start-game-test
   (testing "Start the game and change state with game values"
-    (is (= {:board  [24 24]
-            :score  0
-            :state  :started
-            :tokens {:snake {:position  [[13 12] [12 12] [11 12]]
-                             :direction [1 0]
-                             :speed     1}}}
-           (with-redefs [events/attach-on-key-listener (fn [])]
+    (with-redefs [events/attach-on-key-listener (constantly nil)]
+                 (is (= {:board  [24 24]
+                         :score  0
+                         :state  :started
+                         :tokens {:snake {:position  [[13 12] [12 12] [11 12]]
+                                          :direction [1 0]
+                                          :speed     1}}}
                         (events/start-game {} [:start-game]))))))
