@@ -14,7 +14,7 @@
        (keyword)))
 
 (defn new-game [width height snake-length]
-  (let [game-state (b/initial-state width height snake-length)]
+  (let [game-state (b/place-food (b/initial-state width height snake-length))]
     {(game-id game-state) game-state}))
 
 (defn modulo-vector [position-vector modulos]
