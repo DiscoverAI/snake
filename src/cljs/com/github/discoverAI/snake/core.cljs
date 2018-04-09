@@ -12,6 +12,7 @@
 
 (defn mount-root []
   (re-frame/clear-subscription-cache!)
+  (events/start)
   (reagent/render [views/base-template]
                   (.getElementById js/document "app")))
 

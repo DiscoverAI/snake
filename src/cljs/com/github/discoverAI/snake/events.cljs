@@ -2,7 +2,8 @@
   (:require [re-frame.core :as re-frame]
             [com.github.discoverAI.snake.db :as db]
             [com.github.discoverAI.snake.websocket-api :as ws-api]
-            [taoensso.sente :as sente]))
+            [taoensso.sente :as sente]
+            [taoensso.encore :refer-macros (have)]))
 
 (defn init-db [_db _event]
   db/default-db)
@@ -28,9 +29,47 @@
   start-game)
 
 (defn register-game [db event]
-  (println "registering game with id: " (second event))
   (db/register-game db (second event)))
 
 (re-frame/reg-event-db
   ::register-game-id
   register-game)
+
+(defn update-game-state [db event]
+  (println "updating game state")
+  (println (second event))
+  (db/update-game db (second event)))
+
+(re-frame/reg-event-db
+  ::update-game-state
+  update-game-state)
+
+(defmulti -event-msg-handler :id)
+
+(defn event-msg-handler [{:as ev-msg}]
+  (-event-msg-handler ev-msg))
+
+(defmethod -event-msg-handler :default
+  [{:keys [event]}]
+  (println "Unhandled event: %s" event))
+
+(defmethod -event-msg-handler :chsk/state
+  [{:keys [?data]}]
+  (let [[old-state-map new-state-map] (have vector? ?data)]
+    (if (:first-open? new-state-map)
+      (println "Channel socket successfully established!: %s" new-state-map)
+      (println "Channel socket state change: %s" new-state-map))))
+
+(defmethod -event-msg-handler :chsk/recv
+  [{:keys [?data]}]
+  (let [[id data] ?data]
+    (when (= :game/update-game-state id)
+      (re-frame/dispatch [::update-game-state data]))))
+
+(defmethod -event-msg-handler :chsk/handshake
+  [{:keys [?data]}]
+  (let [[?uid ?csrf-token ?handshake-data] ?data]
+    (println "Handshake: %s" ?data)))
+
+(defn start []
+  (sente/start-client-chsk-router! ws-api/ch-chsk event-msg-handler))

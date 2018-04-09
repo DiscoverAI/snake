@@ -22,3 +22,6 @@
 
 (defn register-game [db game-id]
   (assoc db :game-id game-id))
+
+(defn update-game [db new-game-state]
+  (merge db new-game-state))

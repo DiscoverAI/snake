@@ -1,7 +1,7 @@
 (ns com.github.discoverAI.snake.websocket-api
   (:require [com.github.discoverAI.snake.websocket-config :as ws]
-
-            [taoensso.sente :as sente]))
+            [taoensso.sente :as sente]
+            [re-frame.core :as re-frame]))
 
 (let [{:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket! ws/INIT_ROUTE ws/CLIENT_CONFIG)]
   (def chsk chsk)

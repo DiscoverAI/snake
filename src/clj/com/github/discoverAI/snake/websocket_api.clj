@@ -5,7 +5,7 @@
             [clojure.tools.logging :as log]))
 
 (let [{:keys [ch-recv send-fn connected-uids ajax-post-fn ajax-get-or-ws-handshake-fn]}
-      (sente/make-channel-socket! (get-sch-adapter) {})]
+      (sente/make-channel-socket! (get-sch-adapter) {:user-id-fn (fn [ring-req] (:client-id ring-req))})]
   (def ring-ajax-post ajax-post-fn)
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
   (def ch-chsk ch-recv)                                     ; ChannelSocket's receive channel
@@ -27,7 +27,11 @@
   [{:keys [?data]} {:keys [games]}]
   (eg/change-direction games :mocked-game-id (:direction ?data)))
 
+(defn push-game-state-to-client [client-id game-state]
+  (chsk-send! client-id [:game/update-game-state game-state]))
+
 (defmethod -event-msg-handler
   ::start-new-game
-  [{:keys [?data ?reply-fn]} engine]
-  (?reply-fn (eg/register-new-game engine (:width ?data) (:height ?data) (:snake-length ?data))))
+  [{:keys [?data ?reply-fn uid]} engine]
+  (?reply-fn (eg/register-new-game engine (:width ?data) (:height ?data) (:snake-length ?data)
+                                   (partial push-game-state-to-client uid))))

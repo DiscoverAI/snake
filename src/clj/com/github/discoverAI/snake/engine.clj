@@ -34,15 +34,19 @@
 (defn change-direction [{:keys [games scheduler]} game-id direction]
   (log/info "Change direction: " direction))
 
-(defn register-new-game [{:keys [games scheduler]} width height snake-length]
+(defn update-game-state! [games-atom game-id callback-fn]
+  (swap! games-atom update game-id move)
+  (callback-fn (game-id @games-atom)))
+
+(defn register-new-game [{:keys [games scheduler]} width height snake-length callback-fn]
   (let [game (new-game width height snake-length)
-        id (first (keys game))]
+        game-id (first (keys game))]
     (swap! games merge game)
     (at-at/every MOVE_UPDATE_INTERVAL
-                 #(swap! games update id move)
+                 #(update-game-state! games game-id callback-fn)
                  (scheduler/pool scheduler)
                  :desc "UpdateGameStateTask")
-    id))
+    game-id))
 
 (defn games-state-status [games-state-atom]
   (if (and (map? @games-state-atom) (<= 0 (count @games-state-atom)))
