@@ -36,8 +36,6 @@
   register-game)
 
 (defn update-game-state [db event]
-  (println "updating game state")
-  (println (second event))
   (db/update-game db (second event)))
 
 (re-frame/reg-event-db
@@ -51,14 +49,13 @@
 
 (defmethod -event-msg-handler :default
   [{:keys [event]}]
-  (println "Unhandled event: %s" event))
+  (println "Unhandled event: " event))
 
 (defmethod -event-msg-handler :chsk/state
   [{:keys [?data]}]
-  (let [[old-state-map new-state-map] (have vector? ?data)]
+  (let [[new-state-map] (have vector? ?data)]
     (if (:first-open? new-state-map)
-      (println "Channel socket successfully established!: %s" new-state-map)
-      (println "Channel socket state change: %s" new-state-map))))
+      (println "Channel socket successfully established!"))))
 
 (defmethod -event-msg-handler :chsk/recv
   [{:keys [?data]}]
@@ -68,8 +65,7 @@
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:keys [?data]}]
-  (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (println "Handshake: %s" ?data)))
+  (println "Handshake:" ?data))
 
 (defn start []
   (sente/start-client-chsk-router! ws-api/ch-chsk event-msg-handler))
