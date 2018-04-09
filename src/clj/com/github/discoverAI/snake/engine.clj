@@ -17,19 +17,23 @@
   (let [game-state (b/initial-state width height snake-length)]
     {(game-id game-state) game-state}))
 
-(defn vector-addition [first second]
-  (vec (map + first second)))
+(defn modulo-vector [position-vector modulos]
+  (map mod position-vector modulos))
+
+(defn vector-addition [first second board]
+  (-> (map + first second)
+      (modulo-vector board)))
 
 (def MOVE_UPDATE_INTERVAL 1000)
 
-(defn move-snake [{:keys [direction] :as snake}]
+(defn move-snake [board {:keys [direction] :as snake}]
   (update snake :position
           (fn [snake-position]
-            (concat [(vector-addition (first snake-position) direction)]
+            (concat [(vector-addition (first snake-position) direction board)]
                     (drop-last snake-position)))))
 
 (defn move [game-state]
-  (update-in game-state [:tokens :snake] move-snake))
+  (update-in game-state [:tokens :snake] (partial move-snake (:board game-state))))
 
 (defn change-direction [{:keys [games scheduler]} game-id direction]
   (log/info "Change direction: " direction))

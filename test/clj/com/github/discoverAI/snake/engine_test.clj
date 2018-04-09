@@ -63,7 +63,15 @@
 (deftest test-vector-add
   (testing "On a tick, the snake should move one pixel into the given direction"
     (is (= [1 4]
-           (eg/vector-addition [1 2] [0 2])))))
+           (eg/vector-addition [1 2] [0 2] [9 9])))))
+
+(deftest test-vector-modulo
+  (testing "On board overflow, apply modulo operation to each elements of first vector with second one."
+    (is (= [0 0]
+           (eg/modulo-vector [4 0] [4 4])))
+
+    (is (= [3 0]
+           (eg/modulo-vector [3 4] [4 4])))))
 
 (deftest move-the-snake
   (testing "move snake one pixel into the given direction"
@@ -71,4 +79,14 @@
             :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
                              :direction [1 0]
                              :speed     1.0}}}
-           (eg/move game-20-20-3)))))
+           (eg/move game-20-20-3))))
+
+  (testing "move snake back to the left side of the field, when it overflows the field on the right side"
+    (is (= {:board  [4 4]
+            :tokens {:snake {:position  [[0 0] [3 0] [2 0]]
+                             :direction [1 0]
+                             :speed     1.0}}}
+           (eg/move {:board  [4 4]
+                     :tokens {:snake {:position  [[3 0] [2 0] [1 0]]
+                                      :direction [1 0]
+                                      :speed     1.0}}})))))
