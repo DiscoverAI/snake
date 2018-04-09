@@ -26,3 +26,8 @@
   ::key-pressed
   [{:keys [?data]} {:keys [games]}]
   (eg/change-direction games :mocked-game-id (:direction ?data)))
+
+(defmethod -event-msg-handler
+  ::start-new-game
+  [{:keys [?data ?reply-fn]} engine]
+  (?reply-fn (eg/register-new-game engine (:width ?data) (:height ?data) (:snake-length ?data))))

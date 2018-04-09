@@ -15,3 +15,6 @@
 (defn send-key-pressed [keycode]
   (if (some #{keycode} (keys ARROW_KEY_CODES))
     (chsk-send! [::key-pressed {:direction (get ARROW_KEY_CODES keycode)}])))
+
+(defn start-new-game [game-params callback]
+  (chsk-send! [::start-new-game game-params] 3000 callback))

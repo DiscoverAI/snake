@@ -34,7 +34,9 @@
   [:footer
    (let [current-state @(subscribe [::subs/current-state])]
      (cond
-       (= db/not-started current-state) [:a {:class "btn" :on-click #(dispatch [::events/start-game])} "New Game"]
+       (= db/not-started current-state) [:a {:class "btn" :on-click #(dispatch [::events/start-game
+                                                                                {:width 24 :height 24 :snake-length 3}])}
+                                         "New Game"]
        (= db/started current-state) [:span "Use your keyboard arrows to navigate"]
        :else [:span ""]))])
 
