@@ -53,7 +53,7 @@
                                    (:engine system)))
 
                          (is (= game-20-20-3-id
-                                (eg/register-new-game (:engine system) 20 20 3)))
+                                (eg/register-new-game (:engine system) 20 20 3 (constantly nil))))
 
                          (is (= game-20-20-3
                                 (game-20-20-3-id @(get-in system [:engine :games]))))
