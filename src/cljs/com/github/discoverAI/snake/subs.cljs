@@ -28,3 +28,10 @@
 (re-frame/reg-sub
   ::snake
   snake)
+
+(defn food [db]
+  (get-in db [:tokens :food]))
+
+(re-frame/reg-sub
+  ::food
+  food)
