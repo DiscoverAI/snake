@@ -12,7 +12,7 @@
    :tokens {:snake {:position  [[11 10] [10 10] [9 10]]
                     :direction [1 0]
                     :speed     1.0}
-            :food  {:position [1 2]}}})
+            :food  {:position [[1 2]]}}})
 
 (def game-20-20-3-id :foobar)
 
@@ -35,7 +35,7 @@
 (deftest new-game-test
   (testing "Should create a new game with game id"
     (with-redefs [eg/game-id (constantly game-20-20-3-id)
-                  b/random-vector (constantly [1 2])]
+                  b/random-vector (constantly [[1 2]])]
       (is (= {game-20-20-3-id game-20-20-3}
              (eg/new-game 20 20 3)))
 
@@ -45,7 +45,7 @@
 (deftest register-new-game-test
   (testing "Should add a new game to component and register move function with scheduler"
     (let [moved? (atom false)]
-      (with-redefs [b/random-vector (constantly [1 2])
+      (with-redefs [b/random-vector (constantly [[1 2]])
                     eg/game-id (fn [game-state]
                                  (is (= game-20-20-3 game-state))
                                  game-20-20-3-id)
@@ -84,7 +84,7 @@
             :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
                              :direction [1 0]
                              :speed     1.0}
-                     :food  {:position [1 2]}}}
+                     :food  {:position [[1 2]]}}}
            (eg/move game-20-20-3))))
 
   (testing "move snake back to the left side of the field, when it overflows the field on the right side"

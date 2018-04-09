@@ -62,7 +62,7 @@
                                        ))
                                (reset! called true)
                                :pseudo-random)]
-        (is (= [:pseudo-random :pseudo-random]
+        (is (= [[:pseudo-random :pseudo-random]]
                (b/random-vector [5 5] [[1 2] [2 3]])))
 
         (is (true? @called))))))
@@ -88,8 +88,8 @@
       (is (not= (extract-food-position (b/place-food game-state))
                 (extract-food-position (b/place-food game-state))))
 
-      (is (not= {:position [2 2]}
+      (is (not= {:position [[2 2]]}
                 (extract-food-position (b/place-food game-state))))
 
-      (is (not= {:position [1 2]}
+      (is (not= {:position [[1 2]]}
                 (extract-food-position (b/place-food game-state)))))))

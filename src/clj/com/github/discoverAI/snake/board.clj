@@ -28,8 +28,8 @@
 (defn random-vector [[x y] blacklist]
   (let [blacklist-x (map first blacklist)
         blacklist-y (map second blacklist)]
-    [(rand-nth (filtered-range x blacklist-x))
-     (rand-nth (filtered-range y blacklist-y))]))
+    [[(rand-nth (filtered-range x blacklist-x))
+      (rand-nth (filtered-range y blacklist-y))]]))
 
 (defn place-food [game-state]
   (assoc-in game-state [:tokens :food :position]
