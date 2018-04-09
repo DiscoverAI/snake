@@ -1,5 +1,5 @@
 (def phantomjs-bin (or (System/getenv "PHANTOMJSBIN")
-                     "./dev-resources/phantomjs-2.1.1-linux-x86_64"))
+                     "./dev-resources/phantomjs"))
 
 (def java-opts (if (= (System/getProperty "java.version") "10") ["--add-modules" "java.xml.bind"] []))
 

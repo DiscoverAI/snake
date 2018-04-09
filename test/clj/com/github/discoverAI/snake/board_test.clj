@@ -50,3 +50,46 @@
                              :direction [1 0]
                              :speed     1.0}}}
            (b/initial-state 3 3 2)))))
+
+(deftest random-exclude
+  (testing "should randomly produce a vector without blacklisted numbers"
+    (let [called (atom false)]
+      (with-redefs [rand-nth (fn [collection]
+                               (is (or (= [0 3 4]
+                                          collection)
+                                       (= [0 1 4]
+                                          collection)
+                                       ))
+                               (reset! called true)
+                               :pseudo-random)]
+        (is (= [:pseudo-random :pseudo-random]
+               (b/random-vector [5 5] [[1 2] [2 3]])))
+
+        (is (true? @called))))))
+
+(defn extract-food-position [game-state]
+  (get-in game-state [:tokens :food]))
+
+(defn without-food-position [game-state]
+  (update-in game-state [:tokens] dissoc :food))
+
+(deftest randomly-place-food-on-board
+  (let [game-state {:board  [50 50]
+                    :tokens {:snake {:position  [[2 2] [1 2]]
+                                     :direction [1 0]
+                                     :speed     1.0}}}]
+    (testing "Place food on board on random position, not on top of snake"
+      (is (= {:board  [50 50]
+              :tokens {:snake {:position  [[2 2] [1 2]]
+                               :direction [1 0]
+                               :speed     1.0}}}
+             (without-food-position (b/place-food game-state))))
+
+      (is (not= (extract-food-position (b/place-food game-state))
+                (extract-food-position (b/place-food game-state))))
+
+      (is (not= {:position [2 2]}
+                (extract-food-position (b/place-food game-state))))
+
+      (is (not= {:position [1 2]}
+                (extract-food-position (b/place-food game-state)))))))
