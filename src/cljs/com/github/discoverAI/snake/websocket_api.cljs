@@ -9,12 +9,15 @@
   (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
   (def chsk-state state))
 
-(def ARROW_KEY_CODES {37 :left
-                      39 :right})
+(def KEY_CODE->DIRECTION_VECTOR
+  {37 [-1 0]
+   38 [0 -1]
+   39 [1 0]
+   40 [0 1]})
 
 (defn send-key-pressed [keycode]
-  (if (some #{keycode} (keys ARROW_KEY_CODES))
-    (chsk-send! [::key-pressed {:direction (get ARROW_KEY_CODES keycode)}])))
+  (if (some #{keycode} (keys KEY_CODE->DIRECTION_VECTOR))
+    (chsk-send! [::key-pressed {:direction (get KEY_CODE->DIRECTION_VECTOR keycode)}])))
 
 (defn start-new-game [game-params callback]
   (chsk-send! [::start-new-game game-params] 3000 callback))
