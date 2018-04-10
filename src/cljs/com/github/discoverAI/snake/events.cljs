@@ -42,6 +42,8 @@
   ::update-game-state
   update-game-state)
 
+;; Websocket stuff
+
 (defmulti -event-msg-handler :id)
 
 (defn event-msg-handler [{:as ev-msg}]

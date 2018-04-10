@@ -6,7 +6,8 @@
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as c]
             [com.github.discoverAI.snake.engine :as eg]
-            [com.github.discoverAI.snake.endpoint :as ep]))
+            [com.github.discoverAI.snake.endpoint :as ep])
+  (:gen-class))
 
 (defn snake-system [runtime-config]
   (-> (system/base-system runtime-config)

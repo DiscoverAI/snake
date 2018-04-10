@@ -12,7 +12,7 @@
 
   :min-lein-version "2.5.3"
   :test-paths ["test/clj" "test/cljs"]
-	:jvm-opts ~java-opts
+  :jvm-opts ~java-opts
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.145"]
@@ -30,11 +30,12 @@
   :aliases {"test-all" ["do" "test" ["doo" "once"]]}
 
   :main ^:skip-aot com.github.discoverAI.snake.core
-  :source-paths ["src/cljc" "src/clj/"]
-  :profiles {:dev {:dependencies [[binaryage/devtools "0.9.9"]
-                                  [ring/ring-mock "0.3.2"]]
-                   :plugins      [[lein-figwheel "0.5.13"]
-                                  [lein-release/lein-release "1.0.9"]]}}
+  :source-paths ["src/clj/" "src/cljc"]
+  :profiles {:uberjar {:aot :all}
+             :dev     {:dependencies [[binaryage/devtools "0.9.9"]
+                                      [ring/ring-mock "0.3.2"]]
+                       :plugins      [[lein-figwheel "0.5.13"]
+                                      [lein-release/lein-release "1.0.9"]]}}
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "resources/public/css"]
   :doo {:build "test"
         :alias {:default [:phantom]}
