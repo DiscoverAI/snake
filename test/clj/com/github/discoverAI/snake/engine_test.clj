@@ -96,3 +96,13 @@
                      :tokens {:snake {:position  [[3 0] [2 0] [1 0]]
                                       :direction [1 0]
                                       :speed     1.0}}})))))
+
+(deftest snake-on-food?-test
+  (testing "should return true if snake head coincident with food"
+    (is (eg/snake-on-food? {:board  [4 4]
+                            :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
+                                     :food  {:position [[0 0]]}}})))
+  (testing "should return false if snake is not on a food token"
+    (is (not (eg/snake-on-food? {:board  [4 4]
+                                 :tokens {:snake {:position [[1 0] [2 0] [3 0]]}
+                                          :food  {:position [[0 0]]}}})))))

@@ -26,6 +26,10 @@
 
 (def MOVE_UPDATE_INTERVAL 1000)
 
+(defn snake-on-food? [games-state]
+  (= (first (get-in games-state [:tokens :snake :position]))
+     (first (get-in games-state [:tokens :food :position]))))
+
 (defn move-snake [board {:keys [direction] :as snake}]
   (update snake :position
           (fn [snake-position]
