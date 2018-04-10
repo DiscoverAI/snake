@@ -5,7 +5,8 @@
             [de.otto.status :as st]
             [de.otto.tesla.stateful.app-status :as as]
             [overtone.at-at :as at-at]
-            [de.otto.tesla.stateful.scheduler :as scheduler]))
+            [de.otto.tesla.stateful.scheduler :as scheduler]
+            [com.github.discoverAI.snake.token :as token]))
 
 (defn game-id [game-state]
   (->> (hash game-state)
@@ -39,8 +40,8 @@
 (defn move [game-state]
   (update-in game-state [:tokens :snake] (partial move-snake (:board game-state))))
 
-(defn change-direction [{:keys [games scheduler]} game-id direction]
-  (log/info "Change direction: " direction))
+(defn change-direction [games game-id direction]
+  (swap! games assoc-in [game-id :tokens :snake :direction] direction))
 
 (defn update-game-state! [games-atom game-id callback-fn]
   (swap! games-atom update game-id move)

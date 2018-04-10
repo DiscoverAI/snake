@@ -25,7 +25,7 @@
 (defmethod -event-msg-handler
   ::key-pressed
   [{:keys [?data]} {:keys [games]}]
-  (eg/change-direction games :mocked-game-id (:direction ?data)))
+  (eg/change-direction games (:game-id ?data) (:direction ?data)))
 
 (defn push-game-state-to-client [client-id game-state]
   (chsk-send! client-id [:game/update-game-state game-state]))

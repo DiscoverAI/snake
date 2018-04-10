@@ -106,3 +106,14 @@
     (is (not (eg/snake-on-food? {:board  [4 4]
                                  :tokens {:snake {:position [[1 0] [2 0] [3 0]]}
                                           :food  {:position [[0 0]]}}})))))
+
+(deftest change-direction-test
+  (testing "should change direction")
+  (let [games (atom {:G_2015683382577 {:tokens {:snake {:direction [1 0]}}}})]
+    (eg/change-direction games :G_2015683382577 [0 -1])
+    (is (= [0 -1]
+           (get-in @games [:G_2015683382577 :tokens :snake :direction])
+           ))
+    )
+
+  )
