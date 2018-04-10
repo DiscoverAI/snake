@@ -22,12 +22,17 @@
                  [de.otto/tesla-microservice "0.11.25"]
                  [de.otto/tesla-httpkit "1.0.1"]
                  [org.clojure/tools.logging "0.4.0"]
-                 [ch.qos.logback/logback-classic "1.2.3"]]
+                 [ch.qos.logback/logback-classic "1.2.3"]
+                 [hiccup "1.0.5"]]
 
   :plugins [[lein-cljsbuild "1.1.5"]
             [lein-doo "0.1.8"]
             [deraen/lein-sass4clj "0.3.1"]]
-  :aliases {"test-all" ["do" "test" ["doo" "once"]]}
+  :aliases {"test-all" ["do" "test" ["doo" "once"]]
+            "uberjar"  ["do" "clean" ["sass4clj" "once"] ["cljsbuild" "once" "min"] "uberjar"]}
+
+  :auto-clean false
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "resources/public/css"]
 
   :main ^:skip-aot com.github.discoverAI.snake.core
   :source-paths ["src/clj/" "src/cljc"]
@@ -36,7 +41,6 @@
                                       [ring/ring-mock "0.3.2"]]
                        :plugins      [[lein-figwheel "0.5.13"]
                                       [lein-release/lein-release "1.0.9"]]}}
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "resources/public/css"]
   :doo {:build "test"
         :alias {:default [:phantom]}
         :paths {:phantom ~phantomjs-bin}}
@@ -46,7 +50,7 @@
   :figwheel {:css-dirs ["resources/public/css"]}
 
   :cljsbuild {:builds [{:id           "dev"
-                        :source-paths ["src/cljs"]
+                        :source-paths ["src/cljs" "src/cljc"]
                         :figwheel     {:on-jsload "com.github.discoverAI.snake.core/mount-root"}
                         :compiler     {:main                 com.github.discoverAI.snake.core
                                        :output-to            "resources/public/js/compiled/app.js"
@@ -57,14 +61,14 @@
                                        :external-config      {:devtools/config {:features-to-install :all}}
                                        }}
                        {:id           "min"
-                        :source-paths ["src/cljs"]
+                        :source-paths ["src/cljs" "src/cljc"]
                         :compiler     {:main            com.github.discoverAI.snake.core
                                        :output-to       "resources/public/js/compiled/app.js"
                                        :optimizations   :advanced
                                        :closure-defines {goog.DEBUG false}
                                        :pretty-print    false}}
                        {:id           "test"
-                        :source-paths ["src/cljs" "test/cljs"]
+                        :source-paths ["src/cljs" "test/cljs" "src/cljc"]
                         :compiler     {:main          com.github.discoverAI.snake.test-runner
                                        :output-to     "resources/public/js/compiled/tests.js"
                                        :output-dir    "resources/public/js/compiled/test/out"
