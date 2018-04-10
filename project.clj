@@ -36,6 +36,7 @@
                                       [ring/ring-mock "0.3.2"]]
                        :plugins      [[lein-figwheel "0.5.13"]
                                       [lein-release/lein-release "1.0.9"]]}}
+  :uberjar-name "snake.jar"
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "resources/public/css"]
   :doo {:build "test"
         :alias {:default [:phantom]}

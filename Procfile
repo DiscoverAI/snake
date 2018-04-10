@@ -1,0 +1,2 @@
+web: lein cljsbuild once min && lein sass4clj once && cd resources/public/ && python -m SimpleHTTPServer $PORT 
+backend: java $JVM_OPTS -cp target/snake.jar clojure.main -m com.github.discoverAI.snake.core
