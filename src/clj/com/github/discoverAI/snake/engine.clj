@@ -21,9 +21,8 @@
 (defn modulo-vector [position-vector modulos]
   (map mod position-vector modulos))
 
-(defn vector-addition [first second board]
-  (-> (map + first second)
-      (modulo-vector board)))
+(defn vector-addition [first second]
+  (map + first second))
 
 (def MOVE_UPDATE_INTERVAL 1000)
 
@@ -34,14 +33,22 @@
 (defn move-snake [board {:keys [direction] :as snake}]
   (update snake :position
           (fn [snake-position]
-            (concat [(vector-addition (first snake-position) direction board)]
+            (concat [(modulo-vector (vector-addition (first snake-position) direction) board)]
                     (drop-last snake-position)))))
 
 (defn move [game-state]
   (update-in game-state [:tokens :snake] (partial move-snake (:board game-state))))
 
+(defn new-direction-vector [old new]
+  (if (= (vector-addition old new) [0 0])
+    old
+    new))
+
 (defn change-direction [games game-id direction]
-  (swap! games assoc-in [game-id :tokens :snake :direction] direction))
+  (let [direction-path [game-id :tokens :snake :direction]
+        current-dir (get-in @games direction-path)]
+    (swap! games assoc-in direction-path
+           (new-direction-vector current-dir direction))))
 
 (defn update-game-state! [games-atom game-id callback-fn]
   (swap! games-atom update game-id move)

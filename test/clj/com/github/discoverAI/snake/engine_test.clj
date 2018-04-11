@@ -68,7 +68,17 @@
 (deftest test-vector-add
   (testing "On a tick, the snake should move one pixel into the given direction"
     (is (= [1 4]
-           (eg/vector-addition [1 2] [0 2] [9 9])))))
+           (eg/vector-addition [1 2] [0 2])))))
+
+(deftest test-new-direction
+  (testing "On attempt to turn the snake 180° around or in the same direction the direction vector should stay the same"
+    (is (= [1 0] (eg/new-direction-vector [1 0] [-1 0])))
+    (is (= [1 0] (eg/new-direction-vector [1 0] [1 0])))))
+
+(deftest test-new-direction
+  (testing "On a valid direction update, the direction is updated"
+    (is (= [0 1] (eg/new-direction-vector [1 0] [0 1])))
+    (is (= [0 -1] (eg/new-direction-vector [1 0] [0 -1])))))
 
 (deftest test-vector-modulo
   (testing "On board overflow, apply modulo operation to each elements of first vector with second one."
