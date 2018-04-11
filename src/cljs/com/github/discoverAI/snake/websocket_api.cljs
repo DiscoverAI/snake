@@ -15,9 +15,10 @@
    39 [1 0]
    40 [0 1]})
 
-(defn send-key-pressed [keycode]
+(defn send-key-pressed [keycode game-id]
   (if (some #{keycode} (keys KEY_CODE->DIRECTION_VECTOR))
-    (chsk-send! [::key-pressed {:direction (get KEY_CODE->DIRECTION_VECTOR keycode)}])))
+    (chsk-send! [::key-pressed {:direction (get KEY_CODE->DIRECTION_VECTOR keycode)
+                                :game-id   game-id}])))
 
 (defn start-new-game [game-params callback]
   (chsk-send! [::start-new-game game-params] 3000 callback))

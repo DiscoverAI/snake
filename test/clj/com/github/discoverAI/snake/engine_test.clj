@@ -5,7 +5,8 @@
             [com.github.discoverAI.snake.engine :as eg]
             [clojure.string :as s]
             [com.github.discoverAI.snake.board-test :as bt]
-            [com.github.discoverAI.snake.board :as b]))
+            [com.github.discoverAI.snake.board :as b]
+            [com.github.discoverAI.snake.token :as t]))
 
 (def game-20-20-3
   {:board  [20 20]
@@ -35,7 +36,7 @@
 (deftest new-game-test
   (testing "Should create a new game with game id"
     (with-redefs [eg/game-id (constantly game-20-20-3-id)
-                  b/random-vector (constantly [[1 2]])]
+                  t/random-food-position (constantly [[1 2]])]
       (is (= {game-20-20-3-id game-20-20-3}
              (eg/new-game 20 20 3)))
 
@@ -45,7 +46,7 @@
 (deftest register-new-game-test
   (testing "Should add a new game to component and register move function with scheduler"
     (let [moved? (atom false)]
-      (with-redefs [b/random-vector (constantly [[1 2]])
+      (with-redefs [t/random-food-position (constantly [[1 2]])
                     eg/game-id (fn [game-state]
                                  (is (= game-20-20-3 game-state))
                                  game-20-20-3-id)
@@ -68,7 +69,17 @@
 (deftest test-vector-add
   (testing "On a tick, the snake should move one pixel into the given direction"
     (is (= [1 4]
-           (eg/vector-addition [1 2] [0 2] [9 9])))))
+           (eg/vector-addition [1 2] [0 2])))))
+
+(deftest test-new-direction
+  (testing "On attempt to turn the snake 180° around or in the same direction the direction vector should stay the same"
+    (is (= [1 0] (eg/new-direction-vector [1 0] [-1 0])))
+    (is (= [1 0] (eg/new-direction-vector [1 0] [1 0])))))
+
+(deftest test-new-direction
+  (testing "On a valid direction update, the direction is updated"
+    (is (= [0 1] (eg/new-direction-vector [1 0] [0 1])))
+    (is (= [0 -1] (eg/new-direction-vector [1 0] [0 -1])))))
 
 (deftest test-vector-modulo
   (testing "On board overflow, apply modulo operation to each elements of first vector with second one."
@@ -106,3 +117,11 @@
     (is (not (eg/snake-on-food? {:board  [4 4]
                                  :tokens {:snake {:position [[1 0] [2 0] [3 0]]}
                                           :food  {:position [[0 0]]}}})))))
+
+(deftest change-direction-test
+  (testing "should change direction")
+  (let [games (atom {:G_2015683382577 {:tokens {:snake {:direction [1 0]}}}})]
+    (eg/change-direction games :G_2015683382577 [0 -1])
+    (is (= [0 -1]
+           (get-in @games [:G_2015683382577 :tokens :snake :direction])
+           ))))
