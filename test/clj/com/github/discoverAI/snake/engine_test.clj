@@ -5,7 +5,8 @@
             [com.github.discoverAI.snake.engine :as eg]
             [clojure.string :as s]
             [com.github.discoverAI.snake.board-test :as bt]
-            [com.github.discoverAI.snake.board :as b]))
+            [com.github.discoverAI.snake.board :as b]
+            [com.github.discoverAI.snake.token :as t]))
 
 (def game-20-20-3
   {:board  [20 20]
@@ -35,7 +36,7 @@
 (deftest new-game-test
   (testing "Should create a new game with game id"
     (with-redefs [eg/game-id (constantly game-20-20-3-id)
-                  b/random-vector (constantly [[1 2]])]
+                  t/random-food-position (constantly [[1 2]])]
       (is (= {game-20-20-3-id game-20-20-3}
              (eg/new-game 20 20 3)))
 
@@ -45,7 +46,7 @@
 (deftest register-new-game-test
   (testing "Should add a new game to component and register move function with scheduler"
     (let [moved? (atom false)]
-      (with-redefs [b/random-vector (constantly [[1 2]])
+      (with-redefs [t/random-food-position (constantly [[1 2]])
                     eg/game-id (fn [game-state]
                                  (is (= game-20-20-3 game-state))
                                  game-20-20-3-id)
@@ -123,7 +124,4 @@
     (eg/change-direction games :G_2015683382577 [0 -1])
     (is (= [0 -1]
            (get-in @games [:G_2015683382577 :tokens :snake :direction])
-           ))
-    )
-
-  )
+           ))))

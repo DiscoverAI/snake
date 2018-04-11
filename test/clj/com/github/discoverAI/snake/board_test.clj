@@ -51,22 +51,6 @@
                              :speed     1.0}}}
            (b/initial-state 3 3 2)))))
 
-(deftest random-exclude
-  (testing "should randomly produce a vector without blacklisted numbers"
-    (let [called (atom false)]
-      (with-redefs [rand-nth (fn [collection]
-                               (is (or (= [0 3 4]
-                                          collection)
-                                       (= [0 1 4]
-                                          collection)
-                                       ))
-                               (reset! called true)
-                               :pseudo-random)]
-        (is (= [[:pseudo-random :pseudo-random]]
-               (b/random-vector [5 5] [[1 2] [2 3]])))
-
-        (is (true? @called))))))
-
 (defn extract-food-position [game-state]
   (get-in game-state [:tokens :food]))
 

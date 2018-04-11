@@ -1,24 +1,20 @@
 (ns com.github.discoverAI.snake.token-test
   (:require [clojure.test :refer :all]
-            [com.github.discoverAI.snake.token :as t]))
+            [com.github.discoverAI.snake.token :as t]
+            [com.github.discoverAI.snake.board :as b]))
 
-(deftest change-direction-test
-  (testing "Turning left should yield the correct direction vector"
-    (is (= [-1 0]
-           (t/change-direction [0 1] t/LEFT)))
-    (is (= [0 1]
-           (t/change-direction [1 0] t/LEFT)))
-    (is (= [1 0]
-           (t/change-direction [0 -1] t/LEFT)))
-    (is (= [0 -1]
-           (t/change-direction [-1 0] t/LEFT))))
+(deftest random-exclude
+  (testing "should randomly produce a vector without blacklisted numbers"
+    (let [called (atom false)]
+      (with-redefs [rand-nth (fn [collection]
+                               (is (or (= [0 3 4]
+                                          collection)
+                                       (= [0 1 4]
+                                          collection)
+                                       ))
+                               (reset! called true)
+                               :pseudo-random)]
+        (is (= [[:pseudo-random :pseudo-random]]
+               (t/random-food-position [5 5] [[1 2] [2 3]])))
 
-  (testing "Turning right should yield the correct direction vector"
-    (is (= [1 0]
-           (t/change-direction [0 1] t/RIGHT)))
-    (is (= [0 -1]
-           (t/change-direction [1 0] t/RIGHT)))
-    (is (= [-1 0]
-           (t/change-direction [0 -1] t/RIGHT)))
-    (is (= [0 1]
-           (t/change-direction [-1 0] t/RIGHT)))))
+        (is (true? @called))))))
