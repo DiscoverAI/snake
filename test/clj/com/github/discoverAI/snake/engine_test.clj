@@ -79,6 +79,18 @@
            (eg/modulo-vector [3 4] [4 4])))))
 
 (deftest move-the-snake
+  (testing "does not drop last node when the head is on a food"
+    (with-redefs [clojure.core/drop-last (fn [_] (throw (Exception. "No no no")))]
+      (eg/move {:board  [4 4]
+                :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
+                         :food  {:position [[0 0]]}}})))
+  (testing "drops the last node when the head is not on a food"
+    (let [call-count (atom 0)]
+      (with-redefs [clojure.core/drop-last (fn [_] (swap! call-count inc))]
+        (eg/move {:board  [4 4]
+                  :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
+                           :food  {:position [[5 5]]}}})
+        (is (= @call-count 1)))))
   (testing "move snake one pixel into the given direction"
     (is (= {:board  [20 20]
             :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
