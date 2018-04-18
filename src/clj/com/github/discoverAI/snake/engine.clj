@@ -39,8 +39,10 @@
 (defn move [game-state]
   (update-in game-state [:tokens :snake] (partial move-snake (:board game-state))))
 
-(defn change-direction [{:keys [games scheduler]} game-id direction]
-  (log/info "Change direction: " direction))
+(defn change-direction [games-state game-id direction]
+  (log/info "Change direction: " direction)
+  (swap! games-state assoc-in [game-id :tokens :snake :direction] direction)
+  (log/debug "new state" (game-id @games-state)))
 
 (defn update-game-state! [games-atom game-id callback-fn]
   (swap! games-atom update game-id move)

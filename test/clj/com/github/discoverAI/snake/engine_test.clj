@@ -106,3 +106,14 @@
     (is (not (eg/snake-on-food? {:board  [4 4]
                                  :tokens {:snake {:position [[1 0] [2 0] [3 0]]}
                                           :food  {:position [[0 0]]}}})))))
+
+(deftest change-direction-test
+  (let [game-state-atom (atom {:foobar {:tokens {:snake {:position  [13 37]
+                                                         :direction [1 0]
+                                                         :speed     1.0}}}})]
+    (eg/change-direction game-state-atom :foobar [0 -1])
+    (is (= {:foobar {:tokens {:snake {:position  [13 37]
+                                      :direction [0 -1]
+                                      :speed     1.0}}}}
+           @game-state-atom)))
+  )

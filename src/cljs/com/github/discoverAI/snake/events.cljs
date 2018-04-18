@@ -12,13 +12,12 @@
   ::initialize-db
   init-db)
 
-(defn key-pressed [event] (ws-api/send-key-pressed (.-keyCode event)))
+(defn key-pressed [game-id event] (ws-api/send-key-pressed game-id (.-keyCode event)))
 
-(defn attach-on-key-listener []
-  (set! (.-onkeydown js/window) key-pressed))
+(defn attach-on-key-listener [game-id]
+  (set! (.-onkeydown js/window) (partial key-pressed game-id)))
 
 (defn start-game [db event]
-  (attach-on-key-listener)
   (ws-api/start-new-game (second event) (fn [callback-reply]
                                           (when (sente/cb-success? callback-reply)
                                             (re-frame/dispatch [::register-game-id callback-reply]))))
@@ -29,6 +28,7 @@
   start-game)
 
 (defn register-game [db event]
+  (attach-on-key-listener (second event))
   (db/register-game db (second event)))
 
 (re-frame/reg-event-db
