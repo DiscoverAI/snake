@@ -30,14 +30,17 @@
   (= (first (get-in games-state [:tokens :snake :position]))
      (first (get-in games-state [:tokens :food :position]))))
 
+(defn rest-of-snake [game-state snake-position]
+  (if (snake-on-food? game-state)
+    snake-position
+    (drop-last snake-position)))
+
 (defn move-snake [{:keys [board tokens] :as game-state}]
   (let [snake (:snake tokens)]
     (update snake :position
             (fn [snake-position]
               (concat [(vector-addition (first snake-position) (:direction snake) board)]
-                      (if (snake-on-food? game-state)
-                        snake-position
-                      (drop-last snake-position)))))))
+                      (rest-of-snake game-state snake-position))))))
 
 (defn move [game-state]
   (let [new-snake (move-snake game-state)]
