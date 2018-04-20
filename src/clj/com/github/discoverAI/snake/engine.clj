@@ -17,11 +17,19 @@
   (let [game-state (b/place-food (b/initial-state width height snake-length))]
     {(game-id game-state) game-state}))
 
+(defn- vector-add [v1 v2]
+  (map + v1 v2))
+
+(defn new-direction-vector [old new]
+  (if (= (vector-add old new) [0 0])
+    old
+    new))
+
 (defn modulo-vector [position-vector modulos]
   (map mod position-vector modulos))
 
-(defn vector-addition [first second board]
-  (-> (map + first second)
+(defn concat-to-snake-head [snake-head direction board]
+  (-> (vector-add snake-head direction)
       (modulo-vector board)))
 
 (def MOVE_UPDATE_INTERVAL 1000)
@@ -39,7 +47,7 @@
   (let [snake (:snake tokens)]
     (update snake :position
             (fn [snake-position]
-              (concat [(vector-addition (first snake-position) (:direction snake) board)]
+              (concat [(concat-to-snake-head (first snake-position) (:direction snake) board)]
                       (rest-of-snake game-state snake-position))))))
 
 (defn move [game-state]
@@ -47,9 +55,10 @@
     (assoc-in game-state [:tokens :snake] new-snake)))
 
 (defn change-direction [games-state game-id direction]
-  (log/info "Change direction: " direction)
-  (swap! games-state assoc-in [game-id :tokens :snake :direction] direction)
-  (log/debug "new state" (game-id @games-state)))
+  (let [direction-path [game-id :tokens :snake :direction]
+        current-dir (get-in @games-state direction-path)]
+    (swap! games-state assoc-in direction-path
+           (new-direction-vector current-dir direction))))
 
 (defn update-game-state! [games-atom game-id callback-fn]
   (swap! games-atom update game-id move)
