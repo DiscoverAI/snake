@@ -15,7 +15,7 @@
      (for [y (range 0 width)
            x (range 0 height)]
        ^{:key (str x "-" y)}
-       [:div {:class (str "field" (or (board-field-class [x y] snake " snake") (board-field-class [x y] food " food")))}]))])
+       [:div {:class (str "field" (or (board-field-class [x y] snake " snake") (board-field-class [x y] food " food") ""))}]))])
 
 (defn board []
   [:section

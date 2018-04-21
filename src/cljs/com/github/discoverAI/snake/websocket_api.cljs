@@ -10,12 +10,20 @@
   (def chsk-state state))
 
 (def KEY_CODE->DIRECTION_VECTOR
-  {37 [-1 0]
+  {
+   ;Arrows
+   37 [-1 0]
    38 [0 -1]
    39 [1 0]
-   40 [0 1]})
+   40 [0 1]
+   ;WASD
+   65 [-1 0]
+   87 [0 -1]
+   68 [1 0]
+   83 [0 1]})
 
 (defn send-key-pressed [game-id keycode]
+  (print keycode)
   (if (some #{keycode} (keys KEY_CODE->DIRECTION_VECTOR))
     (chsk-send! [::key-pressed {:game-id game-id :direction (get KEY_CODE->DIRECTION_VECTOR keycode)}])))
 
