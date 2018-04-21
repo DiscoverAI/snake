@@ -146,3 +146,8 @@
                                       :direction [0 -1]
                                       :speed     1.0}}}}
            @game-state-atom))))
+
+(deftest on-food-test
+  (testing "when the snake is on food, score is incremented and new food is placed")
+  (is (= 1 (:score (eg/on-food game-20-20-3))))
+  (is (not (= [1 2] (get-in (eg/on-food game-20-20-3) [:tokens :food :position])))))
