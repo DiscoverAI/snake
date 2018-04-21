@@ -19,7 +19,8 @@
   {:board  [board-width board-height]
    :tokens {:snake {:position  (initial-snake-position snake-length [(median board-width) (median board-height)] [1 0])
                     :direction [1 0]
-                    :speed     1.0}}})
+                    :speed     1.0}}
+   :score 0})
 
 (defn- filtered-range [max blacklist]
   (->> (range max)

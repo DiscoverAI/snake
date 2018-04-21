@@ -9,6 +9,7 @@
 
 (def game-20-20-3
   {:board  [20 20]
+   :score 0
    :tokens {:snake {:position  [[11 10] [10 10] [9 10]]
                     :direction [1 0]
                     :speed     1.0}
@@ -98,7 +99,8 @@
     (with-redefs [clojure.core/drop-last (fn [_] (throw (Exception. "No no no")))]
       (eg/move {:board  [4 4]
                 :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
-                         :food  {:position [[0 0]]}}})))
+                         :food  {:position [[0 0]]}}
+                :score 1})))
   (testing "drops the last node when the head is not on a food"
     (let [call-count (atom 0)]
       (with-redefs [clojure.core/drop-last (fn [_] (swap! call-count inc))]
@@ -108,6 +110,7 @@
         (is (= @call-count 1)))))
   (testing "move snake one pixel into the given direction"
     (is (= {:board  [20 20]
+            :score 0
             :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
                              :direction [1 0]
                              :speed     1.0}

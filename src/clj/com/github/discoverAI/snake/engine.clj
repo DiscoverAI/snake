@@ -34,9 +34,9 @@
 
 (def MOVE_UPDATE_INTERVAL 1000)
 
-(defn snake-on-food? [games-state]
-  (= (first (get-in games-state [:tokens :snake :position]))
-     (first (get-in games-state [:tokens :food :position]))))
+(defn snake-on-food? [game-state]
+  (= (first (get-in game-state [:tokens :snake :position]))
+     (first (get-in game-state [:tokens :food :position]))))
 
 (defn rest-of-snake [game-state snake-position]
   (if (snake-on-food? game-state)
@@ -50,9 +50,18 @@
               (concat [(concat-to-snake-head (first snake-position) (:direction snake) board)]
                       (rest-of-snake game-state snake-position))))))
 
+(defn new-score [game-state]
+  (if (snake-on-food? game-state)
+    (update-in game-state [:score] (partial + 1))
+    game-state))
+
+(defn new-snake [game-state]
+  (assoc-in game-state [:tokens :snake] (move-snake game-state)))
+
 (defn move [game-state]
-  (let [new-snake (move-snake game-state)]
-    (assoc-in game-state [:tokens :snake] new-snake)))
+  (-> game-state
+      new-score
+      new-snake))
 
 (defn change-direction [games-state game-id direction]
   (let [direction-path [game-id :tokens :snake :direction]
