@@ -60,8 +60,8 @@
                                (is (or (= [0 3 4]
                                           collection)
                                        (= [0 1 4]
-                                          collection)
-                                       ))
+                                          collection)))
+
                                (reset! called true)
                                :pseudo-random)]
         (is (= [[:pseudo-random :pseudo-random]]

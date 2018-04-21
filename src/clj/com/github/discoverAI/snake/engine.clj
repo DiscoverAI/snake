@@ -38,30 +38,26 @@
   (= (first (get-in game-state [:tokens :snake :position]))
      (first (get-in game-state [:tokens :food :position]))))
 
-(defn rest-of-snake [game-state snake-position]
-  (if (snake-on-food? game-state)
-    snake-position
-    (drop-last snake-position)))
-
-(defn move-snake [{:keys [board tokens] :as game-state}]
+(defn move-snake [{:keys [board tokens]} tail-fn]
   (let [snake (:snake tokens)]
     (update snake :position
             (fn [snake-position]
               (concat [(concat-to-snake-head (first snake-position) (:direction snake) board)]
-                      (rest-of-snake game-state snake-position))))))
+                      (tail-fn snake-position))))))
 
 (defn new-score [game-state]
-  (if (snake-on-food? game-state)
-    (update-in game-state [:score] (partial + 1))
-    game-state))
+    (update-in game-state [:score] (partial + 1)))
 
-(defn new-snake [game-state]
-  (assoc-in game-state [:tokens :snake] (move-snake game-state)))
+(defn new-snake [game-state tail-fn]
+  (assoc-in game-state [:tokens :snake] (move-snake game-state tail-fn)))
+
+(defn on-food [game-state]
+  (new-score (b/place-food game-state)))
 
 (defn move [game-state]
-  (-> game-state
-      new-score
-      new-snake))
+  (if (snake-on-food? game-state)
+    (on-food (new-snake game-state identity))
+    (new-snake game-state drop-last)))
 
 (defn change-direction [games-state game-id direction]
   (let [direction-path [game-id :tokens :snake :direction]

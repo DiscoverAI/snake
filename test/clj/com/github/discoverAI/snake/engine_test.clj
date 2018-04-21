@@ -145,5 +145,4 @@
     (is (= {:foobar {:tokens {:snake {:position  [13 37]
                                       :direction [0 -1]
                                       :speed     1.0}}}}
-           @game-state-atom)))
-  )
+           @game-state-atom))))
