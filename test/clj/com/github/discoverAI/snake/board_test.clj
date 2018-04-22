@@ -56,10 +56,10 @@
 (deftest random-exclude
   (testing "should randomly produce a vector without blacklisted numbers"
     (let [called (atom false)]
-      (with-redefs [rand-nth (fn [collection]
-                               (is (or (= [0 3 4]
+      (with-redefs [rand-int (fn [collection]
+                               (is (or (= [5]
                                           collection)
-                                       (= [0 1 4]
+                                       (= 5
                                           collection)))
 
                                (reset! called true)

@@ -23,7 +23,6 @@
    83 [0 1]})
 
 (defn send-key-pressed [game-id keycode]
-  (print keycode)
   (if (some #{keycode} (keys KEY_CODE->DIRECTION_VECTOR))
     (chsk-send! [::key-pressed {:game-id game-id :direction (get KEY_CODE->DIRECTION_VECTOR keycode)}])))
 

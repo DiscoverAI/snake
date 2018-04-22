@@ -1,4 +1,5 @@
-(ns com.github.discoverAI.snake.board)
+(ns com.github.discoverAI.snake.board
+  (:require [clojure.tools.logging :as log]))
 
 (defn- median [x]
   (int (Math/ceil (/ x 2))))
@@ -22,15 +23,11 @@
                     :speed     1.0}}
    :score 0})
 
-(defn- filtered-range [max blacklist]
-  (->> (range max)
-       (remove (set blacklist))))
-
 (defn random-vector [[x y] blacklist]
-  (let [blacklist-x (map first blacklist)
-        blacklist-y (map second blacklist)]
-    [[(rand-nth (filtered-range x blacklist-x))
-      (rand-nth (filtered-range y blacklist-y))]]))
+  (let [random-v [[(rand-int x) (rand-int y)]]]
+    (if (some #{random-v} blacklist)
+      (random-vector [x y] blacklist)
+      random-v)))
 
 (defn place-food [game-state]
   (assoc-in game-state [:tokens :food :position]
