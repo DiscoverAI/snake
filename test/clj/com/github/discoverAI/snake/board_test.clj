@@ -56,17 +56,13 @@
 (deftest random-exclude
   (testing "should randomly produce a vector without blacklisted numbers"
     (let [called (atom false)]
-      (with-redefs [rand-int (fn [collection]
-                               (is (or (= [5]
-                                          collection)
-                                       (= 5
-                                          collection)))
-
+      (with-redefs [rand-nth (fn [collection]
                                (reset! called true)
+                               (is (not (some #{[1 2]} collection)))
+                               (is (not (some #{[2 3]} collection)))
                                :pseudo-random)]
-        (is (= [[:pseudo-random :pseudo-random]]
+        (is (= :pseudo-random
                (b/random-vector [5 5] [[1 2] [2 3]])))
-
         (is (true? @called))))))
 
 (defn extract-food-position [game-state]

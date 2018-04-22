@@ -36,7 +36,7 @@
 (deftest new-game-test
   (testing "Should create a new game with game id"
     (with-redefs [eg/game-id (constantly game-20-20-3-id)
-                  b/random-vector (constantly [[1 2]])]
+                  b/random-vector (constantly [1 2])]
       (is (= {game-20-20-3-id game-20-20-3}
              (eg/new-game 20 20 3)))
 
@@ -46,7 +46,7 @@
 (deftest register-new-game-test
   (testing "Should add a new game to component and register move function with scheduler"
     (let [moved? (atom false)]
-      (with-redefs [b/random-vector (constantly [[1 2]])
+      (with-redefs [b/random-vector (constantly [1 2])
                     eg/game-id (fn [game-state]
                                  (is (= game-20-20-3 game-state))
                                  game-20-20-3-id)
@@ -151,16 +151,3 @@
   (testing "when the snake is on food, score is incremented and new food is placed")
   (is (= 1 (:score (eg/on-food game-20-20-3))))
   (is (not (= [1 2] (get-in (eg/on-food game-20-20-3) [:tokens :food :position])))))
-
-
-
-(deftest move-test
-  (testing ""
-           (eg/move {:board  [24 24]
-                     :score  0
-                     :tokens {:snake {:position  [[9 23] [10 23] [11 23] [12 23] [12 22] [12 21] [12 20] [12 19] [12 18] [12 17] [12 16] [12 15] [12 14] [12 13] [12 12] [12 11] [12 10] [12 9] [12 8] [12 7] [12 6] [12 5] [12 4] [12 3] [11 3] [10 3] [9 3] [8 3] [8 2] [8 1] [8 0]]
-                                      :direction  [-1 0]
-                                      :speed     1.0}
-                              :food  {:position  [[9 23]]}}})
-           )
-    )
