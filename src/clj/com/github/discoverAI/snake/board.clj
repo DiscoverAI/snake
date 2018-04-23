@@ -24,7 +24,9 @@
    :score  0})
 
 (defn- cartesian [v1 v2]
-  (for [x v1 y v2] (vector x y)))
+  (for [x v1
+        y v2]
+    [x y]))
 
 (defn random-vector [[x y] blacklist]
   (rand-nth (vec (set/difference
