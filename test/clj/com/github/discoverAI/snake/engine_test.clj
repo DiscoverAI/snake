@@ -9,7 +9,7 @@
 
 (def game-20-20-3
   {:board  [20 20]
-   :score 0
+   :score  0
    :tokens {:snake {:position  [[11 10] [10 10] [9 10]]
                     :direction [1 0]
                     :speed     1.0}
@@ -100,7 +100,8 @@
       (eg/move {:board  [4 4]
                 :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
                          :food  {:position [[0 0]]}}
-                :score 1})))
+                :score  1})))
+
   (testing "drops the last node when the head is not on a food"
     (let [call-count (atom 0)]
       (with-redefs [clojure.core/drop-last (fn [_] (swap! call-count inc))]
@@ -108,9 +109,10 @@
                   :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
                            :food  {:position [[5 5]]}}})
         (is (= @call-count 1)))))
+
   (testing "move snake one pixel into the given direction"
     (is (= {:board  [20 20]
-            :score 0
+            :score  0
             :tokens {:snake {:position  [[12 10] [11 10] [10 10]]
                              :direction [1 0]
                              :speed     1.0}
@@ -125,7 +127,24 @@
            (eg/move {:board  [4 4]
                      :tokens {:snake {:position  [[3 0] [2 0] [1 0]]
                                       :direction [1 0]
-                                      :speed     1.0}}})))))
+                                      :speed     1.0}}}))))
+
+  (testing "snake is on food and should grow and food disappear and respawn"
+    (let [moved-game-state (eg/move {:board  [4 4]
+                                     :score  42
+                                     :tokens {:snake {:position  [[3 0] [2 0] [1 0]]
+                                                      :direction [1 0]
+                                                      :speed     1.0}
+                                              :food  {:position [[3 0]]}}})]
+      (is (= {:board  [4 4]
+              :score  43
+              :tokens {:snake {:position  [[0 0] [3 0] [2 0] [1 0]]
+                               :direction [1 0]
+                               :speed     1.0}}}
+             (bt/without-food-position moved-game-state)))
+
+      (is (not= [[3 0]]
+                (bt/extract-food-position moved-game-state))))))
 
 (deftest snake-on-food?-test
   (testing "should return true if snake head coincident with food"
@@ -146,11 +165,3 @@
                                       :direction [0 -1]
                                       :speed     1.0}}}}
            @game-state-atom))))
-
-(deftest score-test
-  (testing "score is incremented and new food is placed")
-  (is (= 1 (:score (eg/increase-score game-20-20-3)))))
-
-(deftest moved-snake-test
-  (testing "if tail-fn is applied correctly on moving snake"
-    (is (= [[12 10] "rest" "rest" "rest"] (get-in (eg/moved-snake game-20-20-3 (partial map (constantly "rest"))) [:tokens :snake :position])))))

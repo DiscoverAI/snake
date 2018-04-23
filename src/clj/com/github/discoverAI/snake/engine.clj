@@ -46,14 +46,14 @@
                       (tail-fn snake-position))))))
 
 (defn increase-score [game-state]
-    (update-in game-state [:score] (partial + 1)))
+  (update-in game-state [:score] inc))
 
 (defn moved-snake [game-state tail-fn]
   (assoc-in game-state [:tokens :snake] (move-snake game-state tail-fn)))
 
 (defn move [game-state]
   (if (snake-on-food? game-state)
-    (increase-score (b/place-food game-state))
+    (increase-score (b/place-food (moved-snake game-state identity)))
     (moved-snake game-state drop-last)))
 
 (defn change-direction [games-state game-id direction]
