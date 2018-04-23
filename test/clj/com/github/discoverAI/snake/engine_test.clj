@@ -147,7 +147,10 @@
                                       :speed     1.0}}}}
            @game-state-atom))))
 
-(deftest on-food-test
-  (testing "when the snake is on food, score is incremented and new food is placed")
-  (is (= 1 (:score (eg/on-food game-20-20-3))))
-  (is (not (= [1 2] (get-in (eg/on-food game-20-20-3) [:tokens :food :position])))))
+(deftest score-test
+  (testing "score is incremented and new food is placed")
+  (is (= 1 (:score (eg/increase-score game-20-20-3)))))
+
+(deftest moved-snake-test
+  (testing "if tail-fn is applied correctly on moving snake"
+    (is (= [[12 10] "rest" "rest" "rest"] (get-in (eg/moved-snake game-20-20-3 (partial map (constantly "rest"))) [:tokens :snake :position])))))
