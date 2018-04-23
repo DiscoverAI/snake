@@ -45,19 +45,16 @@
               (concat [(concat-to-snake-head (first snake-position) (:direction snake) board)]
                       (tail-fn snake-position))))))
 
-(defn new-score [game-state]
+(defn increase-score [game-state]
     (update-in game-state [:score] (partial + 1)))
 
-(defn new-snake [game-state tail-fn]
+(defn moved-snake [game-state tail-fn]
   (assoc-in game-state [:tokens :snake] (move-snake game-state tail-fn)))
-
-(defn on-food [game-state]
-  (new-score (b/place-food game-state)))
 
 (defn move [game-state]
   (if (snake-on-food? game-state)
-    (on-food (new-snake game-state identity))
-    (new-snake game-state drop-last)))
+    (increase-score (b/place-food game-state))
+    (moved-snake game-state drop-last)))
 
 (defn change-direction [games-state game-id direction]
   (let [direction-path [game-id :tokens :snake :direction]
