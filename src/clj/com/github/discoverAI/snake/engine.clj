@@ -51,9 +51,11 @@
 (defn moved-snake [game-state tail-fn]
   (assoc-in game-state [:tokens :snake] (move-snake game-state tail-fn)))
 
-(defn move [game-state]
+(defn make-move [game-state]
   (if (snake-on-food? game-state)
-    (increase-score (b/place-food (moved-snake game-state identity)))
+    (-> (moved-snake game-state identity)
+        (b/place-food)
+        (increase-score))
     (moved-snake game-state drop-last)))
 
 (defn change-direction [games-state game-id direction]
@@ -63,7 +65,7 @@
            (new-direction-vector current-dir direction))))
 
 (defn update-game-state! [games-atom game-id callback-fn]
-  (swap! games-atom update game-id move)
+  (swap! games-atom update game-id make-move)
   (callback-fn (game-id @games-atom)))
 
 (defn register-new-game [{:keys [games scheduler]} width height snake-length callback-fn]
