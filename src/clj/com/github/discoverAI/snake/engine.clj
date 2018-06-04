@@ -64,7 +64,8 @@
 
 (defn update-game-state! [games-atom game-id callback-fn]
   (swap! games-atom update game-id move)
-  (callback-fn (game-id @games-atom)))
+  (callback-fn (game-id @games-atom))
+  (get @games-atom game-id))
 
 (defn register-new-game [{:keys [games scheduler]} width height snake-length callback-fn]
   (let [game (new-game width height snake-length)
