@@ -85,7 +85,6 @@
                  :desc "UpdateGameStateTask")
     new-game-id))
 
-
 (defn games-state-status [games-state-atom]
   (if (and (map? @games-state-atom) (<= 0 (count @games-state-atom)))
     (st/status-detail :engine :ok (str (count @games-state-atom) " games registered"))
