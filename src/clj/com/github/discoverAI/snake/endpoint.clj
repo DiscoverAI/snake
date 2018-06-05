@@ -42,12 +42,12 @@
                                 (keyword id)
                                 (fn [_])))}))
 
-(defn handle-get-game-request [{:keys [engine]} id]
-  (if (nil? (get @(:games engine) (keyword id)))
+(defn handle-get-game-request [{:keys [engine]} {:keys [params]}]
+  (if (nil? (get @(:games engine) (keyword (:id params))))
     {:status 404}
     {:status  200
      :headers {"content-type" "application/json"}
-     :body    (json/write-str (get @(:games engine) (keyword id)))}))
+     :body    (json/write-str (get @(:games engine) (keyword (:id params))))}))
 
 (defn endpoint-filter [register-handler move-handler get-game-handler]
   (cc/routes
@@ -55,20 +55,21 @@
     (cc/POST "/register" req (register-handler req))
     (cc/POST "/move/" req (move-handler req))
     (cc/POST "/move" req (move-handler req))
-    (cc/GET "/games/:id" [id] (get-game-handler id))
-    (cc/GET "/games/:id/" [id] (get-game-handler id))
+    (cc/GET "/games/:id" req (get-game-handler req))
+    (cc/GET "/games/:id/" req (get-game-handler req))
     (cc/GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
     (cc/POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))
 
+(defn- timed-handler [handler self]
+  (metrics/timing-middleware (partial handler self)))
+
 (defn create-routes [self]
   (->> (endpoint-filter
-         (partial handle-register-request self)
-         (partial handle-move-request self)
-         (partial handle-get-game-request self))
+         (timed-handler handle-register-request self)
+         (timed-handler handle-move-request self)
+         (timed-handler handle-get-game-request self))
        kparams/wrap-keyword-params
        params/wrap-params))
-
-
 
 (defrecord Endpoint [handler engine]
   c/Lifecycle
