@@ -50,7 +50,7 @@
                     eg/game-id (fn [game-state]
                                  (is (= game-20-20-3 game-state))
                                  game-20-20-3-id)
-                    eg/move (fn [game-state]
+                    eg/make-move (fn [game-state]
                               (is (= game-20-20-3 game-state))
                               (reset! moved? true)
                               game-state)]
@@ -97,16 +97,16 @@
 (deftest move-the-snake
   (testing "does not drop last node when the head is on a food"
     (with-redefs [clojure.core/drop-last (fn [_] (throw (Exception. "No no no")))]
-      (eg/move {:board  [4 4]
-                :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
+      (eg/make-move {:board [4 4]
+                :tokens     {:snake {:position [[0 0] [1 0] [2 0]]}
                          :food  {:position [[0 0]]}}
-                :score  1})))
+                :score      1})))
 
   (testing "drops the last node when the head is not on a food"
     (let [call-count (atom 0)]
       (with-redefs [clojure.core/drop-last (fn [_] (swap! call-count inc))]
-        (eg/move {:board  [4 4]
-                  :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
+        (eg/make-move {:board [4 4]
+                  :tokens     {:snake {:position [[0 0] [1 0] [2 0]]}
                            :food  {:position [[5 5]]}}})
         (is (= @call-count 1)))))
 
@@ -117,22 +117,22 @@
                              :direction [1 0]
                              :speed     1.0}
                      :food  {:position [[1 2]]}}}
-           (eg/move game-20-20-3))))
+           (eg/make-move game-20-20-3))))
 
   (testing "move snake back to the left side of the field, when it overflows the field on the right side"
     (is (= {:board  [4 4]
             :tokens {:snake {:position  [[0 0] [3 0] [2 0]]
                              :direction [1 0]
                              :speed     1.0}}}
-           (eg/move {:board  [4 4]
-                     :tokens {:snake {:position  [[3 0] [2 0] [1 0]]
+           (eg/make-move {:board [4 4]
+                     :tokens     {:snake {:position  [[3 0] [2 0] [1 0]]
                                       :direction [1 0]
                                       :speed     1.0}}}))))
 
   (testing "snake is on food and should grow and food disappear and respawn"
-    (let [moved-game-state (eg/move {:board  [4 4]
-                                     :score  42
-                                     :tokens {:snake {:position  [[3 0] [2 0] [1 0]]
+    (let [moved-game-state (eg/make-move {:board [4 4]
+                                     :score      42
+                                     :tokens     {:snake {:position  [[3 0] [2 0] [1 0]]
                                                       :direction [1 0]
                                                       :speed     1.0}
                                               :food  {:position [[3 0]]}}})]
