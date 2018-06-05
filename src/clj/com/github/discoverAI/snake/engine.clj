@@ -65,7 +65,7 @@
            (new-direction-vector current-dir direction))))
 
 (defn update-game-state! [games-atom game-id callback-fn]
-  (swap! games-atom update game-id move)
+  (swap! games-atom update game-id make-move)
   (callback-fn (game-id @games-atom))
   (get @games-atom game-id))
 

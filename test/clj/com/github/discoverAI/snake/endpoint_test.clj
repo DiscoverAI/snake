@@ -45,7 +45,7 @@
   (testing "If a new game is registered on the register request handler"
     (tu/with-started [system (co/snake-system {})]
                      (register-mock-game (:engine system))
-                     (is (= {:body    (json/write-str (eg/move fake-game-state))
+                     (is (= {:body    (json/write-str (eg/make-move fake-game-state))
                              :headers {"content-type" "application/json"}
                              :status  200}
                             (e/handle-move-request
