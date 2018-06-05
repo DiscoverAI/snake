@@ -22,15 +22,15 @@
 (defn fake-game-id [_] game-id)
 
 (def fake-game-state
-   {:board  [20 20]
-    :score  0
-    :tokens {:snake {:position  [[0 0]]
-                     :direction [1 0]
-                     :speed     1.0}
-             :food  {:position [[1 2]]}}})
+  {:board  [20 20]
+   :score  0
+   :tokens {:snake {:position  [[0 0]]
+                    :direction [1 0]
+                    :speed     1.0}
+            :food  {:position [[1 2]]}}})
 
 (defn- register-mock-game [{:keys [games]}]
-  (swap! games merge   {game-id fake-game-state} (print games)))
+  (swap! games merge {game-id fake-game-state} (print games)))
 
 (deftest register-game-handler-test
   (testing "If a new game is registered on the register request handler"
@@ -45,7 +45,7 @@
   (testing "If a new game is registered on the register request handler"
     (tu/with-started [system (co/snake-system {})]
                      (register-mock-game (:engine system))
-                     (is (= {:body (json/write-str (eg/move fake-game-state))
+                     (is (= {:body    (json/write-str (eg/move fake-game-state))
                              :headers {"content-type" "application/json"}
                              :status  200}
                             (e/handle-move-request

@@ -12,8 +12,6 @@
             [taoensso.sente :as sente]
             [com.github.discoverAI.snake.engine :as eg]))
 
-
-
 (defn handle-register-request [{:keys [engine]} request]
   (let [p (:params request)]
     {:status  200
@@ -24,7 +22,6 @@
                                           (Integer/parseInt (:height p))
                                           (Integer/parseInt (:snake-length p))
                                           (fn []))})}))
-
 
 (defn handle-move-request [{:keys [engine]} request]
   (let [p (:params request)
@@ -83,4 +80,3 @@
 
 (defn new-endpoint []
   (map->Endpoint {}))
-
