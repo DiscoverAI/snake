@@ -13,11 +13,12 @@
             [com.github.discoverAI.snake.engine :as eg]))
 
 
+
 (defn handle-register-request [{:keys [engine]} request]
   (let [p (:params request)]
     {:status  200
      :headers {"content-type" "application/json"}
-     :body    (json/write-str {:game-id (eg/register-new-game
+     :body    (json/write-str {:game-id (eg/register-new-game-without-timer
                                           engine
                                           (Integer/parseInt (:width p))
                                           (Integer/parseInt (:height p))
@@ -26,7 +27,6 @@
 
 
 (defn handle-move-request [{:keys [engine]} request]
-  (log/info "wuff" (:games engine))
   (let [p (:params request)
         id (:id p)
         x-dir (:x p)
@@ -42,32 +42,33 @@
                                 (keyword id)
                                 (fn [_])))}))
 
-
-(defn response [{:keys [engine]} request]
-  (log/info (:query-params request))
-  (if (= 0 (count @(:games engine)))
-    {:status 204}
+(defn handle-get-game-request [{:keys [engine]} id]
+  (if (nil? (get @(:games engine) (keyword id)))
+    {:status 404}
     {:status  200
      :headers {"content-type" "application/json"}
-     :body    (json/write-str @(:games engine))}))
+     :body    (json/write-str (get @(:games engine) (keyword id)))}))
 
-(defn endpoint-filter [register-handler move-handler]
+(defn endpoint-filter [register-handler move-handler get-game-handler]
   (cc/routes
     (cc/POST "/register/" req (register-handler req))
     (cc/POST "/register" req (register-handler req))
     (cc/POST "/move/" req (move-handler req))
     (cc/POST "/move" req (move-handler req))
+    (cc/GET "/games/:id" [id] (get-game-handler id))
+    (cc/GET "/games/:id/" [id] (get-game-handler id))
     (cc/GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
     (cc/POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))
 
 (defn create-routes [self]
   (->> (endpoint-filter
-         (metrics/timing-middleware
-           (partial handle-register-request self))
-         (metrics/timing-middleware
-           (partial handle-move-request self)))
+         (partial handle-register-request self)
+         (partial handle-move-request self)
+         (partial handle-get-game-request self))
        kparams/wrap-keyword-params
        params/wrap-params))
+
+
 
 (defrecord Endpoint [handler engine]
   c/Lifecycle
