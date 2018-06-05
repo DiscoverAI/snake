@@ -67,15 +67,22 @@
   (callback-fn (game-id @games-atom))
   (get @games-atom game-id))
 
-(defn register-new-game [{:keys [games scheduler]} width height snake-length callback-fn]
+(defn register-new-game-without-timer [{:keys [games]} width height snake-length callback-fn]
   (let [game (new-game width height snake-length)
         game-id (first (keys game))]
     (swap! games merge game)
+    game-id))
+
+(defn register-new-game [engine width height snake-length callback-fn]
+  (let [new-game-id (register-new-game-without-timer
+                      engine width height snake-length callback-fn)
+        {:keys [games scheduler]} engine]
     (at-at/every MOVE_UPDATE_INTERVAL
-                 #(update-game-state! games game-id callback-fn)
+                 #(update-game-state! games new-game-id callback-fn)
                  (scheduler/pool scheduler)
                  :desc "UpdateGameStateTask")
-    game-id))
+    new-game-id))
+
 
 (defn games-state-status [games-state-atom]
   (if (and (map? @games-state-atom) (<= 0 (count @games-state-atom)))
