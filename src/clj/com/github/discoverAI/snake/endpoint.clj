@@ -37,7 +37,8 @@
      :body    (json/write-str (eg/update-game-state!
                                 (:games engine)
                                 (keyword id)
-                                (fn [_])))}))
+                                (fn [_])
+                                (:game-timer-tasks engine)))}))
 
 (defn handle-get-game-request [{:keys [engine]} {:keys [params]}]
   (if (nil? (get @(:games engine) (keyword (:id params))))
