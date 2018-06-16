@@ -22,7 +22,9 @@
    (let [current-state @(subscribe [::subs/current-state])]
      (cond
        (= db/not-started current-state) [:h2 "Press \"New Game\" button to start"]
-       (= db/started current-state) [board-grid]))])
+       (= db/started current-state) [board-grid]
+       (= db/game-over current-state) [board-grid]))])
+
 
 (defn info-panel []
   [:header
@@ -30,14 +32,18 @@
    (when-let [score @(subscribe [::subs/score])]
      [:div {:class "score"} [:h1 (str score " Points")]])])
 
+(defn new-game-button []
+  [:a {:class "btn" :on-click #(dispatch [::events/start-game
+                                          {:width 24 :height 24 :snake-length 3}])}
+   "New Game"])
+
 (defn hints []
   [:footer
    (let [current-state @(subscribe [::subs/current-state])]
      (cond
-       (= db/not-started current-state) [:a {:class "btn" :on-click #(dispatch [::events/start-game
-                                                                                {:width 24 :height 24 :snake-length 3}])}
-                                         "New Game"]
+       (= db/not-started current-state) [new-game-button]
        (= db/started current-state) [:span "Use your keyboard arrows to navigate"]
+       (= db/game-over current-state) [new-game-button]
        :else [:span ""]))])
 
 (defn base-template []

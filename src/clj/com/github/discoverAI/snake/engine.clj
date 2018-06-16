@@ -32,7 +32,14 @@
   (-> (vector-add snake-head direction)
       (modulo-vector board)))
 
-(def MOVE_UPDATE_INTERVAL 1000)
+(def MOVE_UPDATE_INTERVAL 100)
+
+(defn game-over? [game-state]
+  (not (apply distinct?
+              (get-in game-state [:tokens :snake :position]))))
+
+(defn end-game [game-state]
+  (assoc game-state :game-over true))
 
 (defn snake-on-food? [game-state]
   (= (first (get-in game-state [:tokens :snake :position]))
@@ -64,8 +71,11 @@
     (swap! games-state assoc-in direction-path
            (new-direction-vector current-dir direction))))
 
-(defn update-game-state! [games-atom game-id callback-fn]
+(defn update-game-state! [games-atom game-id callback-fn timer-tasks]
   (swap! games-atom update game-id make-move)
+  (if (game-over? (get @games-atom game-id))
+    (do (at-at/stop (get @timer-tasks game-id))
+        (swap! games-atom update game-id end-game)))
   (callback-fn (game-id @games-atom))
   (get @games-atom game-id))
 
@@ -78,11 +88,12 @@
 (defn register-new-game [engine width height snake-length callback-fn]
   (let [new-game-id (register-new-game-without-timer
                       engine width height snake-length callback-fn)
-        {:keys [games scheduler]} engine]
-    (at-at/every MOVE_UPDATE_INTERVAL
-                 #(update-game-state! games new-game-id callback-fn)
-                 (scheduler/pool scheduler)
-                 :desc "UpdateGameStateTask")
+        {:keys [games scheduler game-timer-tasks]} engine]
+    (swap! (:game-timer-tasks engine) assoc new-game-id
+           (at-at/every MOVE_UPDATE_INTERVAL
+                        #(update-game-state! games new-game-id callback-fn game-timer-tasks)
+                        (scheduler/pool scheduler)
+                        :desc "UpdateGameStateTask"))
     new-game-id))
 
 (defn games-state-status [games-state-atom]
@@ -96,7 +107,7 @@
     (log/info "-> starting Engine")
     (let [games-state (atom {})]
       (as/register-status-fun app-status (partial games-state-status games-state))
-      (assoc self :games games-state)))
+      (assoc self :games games-state :game-timer-tasks (atom {}))))
   (stop [_]
     (log/info "<- stopping Engine")))
 
