@@ -36,6 +36,7 @@
 
   :main ^:skip-aot com.github.discoverAI.snake.core
   :source-paths ["src/clj/" "src/cljc"]
+  :uberjar-name "snake-deploy-standalone.jar"
   :profiles {:uberjar {:aot :all}
              :dev     {:dependencies [[binaryage/devtools "0.9.9"]
                                       [ring/ring-mock "0.3.2"]]
