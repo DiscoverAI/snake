@@ -38,19 +38,21 @@
 
 (deftest initial-state-test
   (testing "initiating 5x5 game board with snake of size 3 in the middle"
-    (is (= {:board  [5 5]
-            :score 0
-            :tokens {:snake {:position  [[4 3] [3 3] [2 3]]
-                             :direction [1 0]
-                             :speed     1.0}}}
+    (is (= {:board     [5 5]
+            :score     0
+            :tokens    {:snake {:position  [[4 3] [3 3] [2 3]]
+                                :direction [1 0]
+                                :speed     1.0}}
+            :game-over false}
            (b/initial-state 5 5 3))))
 
   (testing "initiating 3x3 game board with snake of size 2 in the middle"
-    (is (= {:board  [3 3]
-            :score 0
-            :tokens {:snake {:position  [[2 2] [1 2]]
-                             :direction [1 0]
-                             :speed     1.0}}}
+    (is (= {:board     [3 3]
+            :score     0
+            :tokens    {:snake {:position  [[2 2] [1 2]]
+                                :direction [1 0]
+                                :speed     1.0}}
+            :game-over false}
            (b/initial-state 3 3 2)))))
 
 (deftest random-exclude

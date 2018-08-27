@@ -1,0 +1,103 @@
+{
+	"info": {
+		"_postman_id": "8f368bd5-584c-48df-b038-ba248572053c",
+		"name": "snake",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register Game",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/register?width=20&height=20&snake-length=10",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"register"
+					],
+					"query": [
+						{
+							"key": "width",
+							"value": "20"
+						},
+						{
+							"key": "height",
+							"value": "20"
+						},
+						{
+							"key": "snake-length",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Move Snake one step",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/move?id=G_581718520074752&x=1&y=0",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"move"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "G_581718520074752"
+						},
+						{
+							"key": "x",
+							"value": "1"
+						},
+						{
+							"key": "y",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get game by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/games/G_581718520074752",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"games",
+						"G_581718520074752"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

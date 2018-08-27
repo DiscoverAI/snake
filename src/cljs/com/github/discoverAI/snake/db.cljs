@@ -17,3 +17,6 @@
 
 (defn update-game [db new-game-state]
   (merge db new-game-state))
+
+(defn end-game [db]
+  (assoc db :state game-over))

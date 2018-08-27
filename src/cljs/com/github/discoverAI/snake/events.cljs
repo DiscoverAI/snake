@@ -23,6 +23,10 @@
                                             (re-frame/dispatch [::register-game-id callback-reply]))))
   (db/start-game db))
 
+(defn end-game [db event]
+  (db/end-game db))
+
+
 (re-frame/reg-event-db
   ::start-game
   start-game)
@@ -41,6 +45,10 @@
 (re-frame/reg-event-db
   ::update-game-state
   update-game-state)
+
+(re-frame/reg-event-db
+  ::end-game
+  end-game)
 
 ;; Websocket stuff
 
@@ -63,7 +71,8 @@
   [{:keys [?data]}]
   (let [[id data] ?data]
     (when (= :game/update-game-state id)
-      (re-frame/dispatch [::update-game-state data]))))
+      (re-frame/dispatch [::update-game-state data])
+      (if (= true (:game-over data)) (re-frame/dispatch [::end-game])))))
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:keys [?data]}]
