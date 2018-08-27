@@ -72,12 +72,12 @@
            (new-direction-vector current-dir direction))))
 
 (defn update-game-state! [games-atom game-id callback-fn timer-tasks]
-  (swap! games-atom update game-id make-move)
-  (if (game-over? (get @games-atom game-id))
+  (if (game-over? (game-id @games-atom))
     (do (at-at/stop (get @timer-tasks game-id))
-        (swap! games-atom update game-id end-game)))
+        (swap! games-atom update game-id end-game))
+    (swap! games-atom update game-id make-move))
   (callback-fn (game-id @games-atom))
-  (get @games-atom game-id))
+  (game-id @games-atom))
 
 (defn register-new-game-without-timer [{:keys [games]} width height snake-length callback-fn]
   (let [game (new-game width height snake-length)

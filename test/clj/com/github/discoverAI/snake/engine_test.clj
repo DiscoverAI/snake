@@ -22,14 +22,12 @@
 
 (def lost-game
    {:board [20 20]
-   :score 0
-   :tokens {:snake {:position  [[11 10] [10 10] [10 9] [11 9] [11 10]]
-                    :direction [1 0]
-                    :speed     1.0}
-            :food  {:position [[1 2]]}}
-   :game-over false})
-
-
+    :score 0
+    :tokens {:snake {:position  [[11 10] [10 10] [10 9] [11 9] [11 10]]
+                     :direction [1 0]
+                     :speed     1.0}
+             :food  {:position [[1 2]]}}
+    :game-over false})
 
 (deftest game-id-test
   (testing "Should calculate a unique game id"
@@ -183,25 +181,41 @@
 (deftest game-over?-test
   (testing "if game over is returned when snake overlaps"
     (is (= true (eg/game-over? {:tokens {:snake {:position [[0 0] [1 0] [2 0] [2 1] [1 1] [1 0]]}}})))
-
+    (is (= true (eg/game-over? lost-game)))
     (is (= false (eg/game-over? {:tokens {:snake {:position [[14 12] [13 12] [12 12]]}}})))))
 
 
 
-(deftest update-game-state!-test
-  (testing "If game is updated correctly"
-    (with-redefs [eg/game-id (fn [game-state]
-                               (is (= lost-game-id game-state))
-                               lost-game-id)
+(deftest update-game-state!-test-lost-game
+  (testing "If game is updated correctly on a lost game"
+    (with-redefs [
+                  eg/game-id (fn [_] lost-game-id)
                   eg/new-game (fn [_,_,_] {lost-game-id lost-game})]
       (tu/with-started [system (co/snake-system {})]
-                       (is (not= nil
-                                 (:engine system)))
+                       (is (not= nil (:engine system)))
                        (is (= lost-game-id
                               (eg/register-new-game (:engine system) 20 20 3 (constantly nil))))
-                       (is (= (eg/make-move (eg/make-move lost-game))
+                       (is (= (assoc lost-game :game-over true)
                               (eg/update-game-state! (get-in system [:engine :games])
                                                      lost-game-id
                                                      (fn [_])
                                                      (get-in system [:engine :game-timer-tasks]))))
                        (is (nil? (get @(get-in system [:engine :game-timer-tasks]) game-20-20-3-id)))))))
+
+(deftest update-game-state!-test-valid-game
+  (testing "If game is updated correctly on an ongoing game"
+    (with-redefs [
+                  eg/game-id (fn [_] game-20-20-3-id)
+                  eg/new-game (fn [_,_,_] {game-20-20-3-id game-20-20-3})
+                  overtone.at-at/every (fn [_,_,_,_,_] :fake-timer)]
+
+      (tu/with-started [system (co/snake-system {})]
+                       (is (not= nil (:engine system)))
+                       (is (= game-20-20-3-id
+                              (eg/register-new-game (:engine system) 20 20 3 (constantly nil))))
+                       (is (= (eg/make-move game-20-20-3)
+                              (eg/update-game-state! (get-in system [:engine :games])
+                                                     game-20-20-3-id
+                                                     (fn [_])
+                                                     (get-in system [:engine :game-timer-tasks]))))
+                       (is (= (:fake-timer (get @(get-in system [:engine :game-timer-tasks]) game-20-20-3-id))))))))
