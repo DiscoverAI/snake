@@ -4,4 +4,4 @@
 
 (def CLIENT_CONFIG
   {:type :auto
-   :host "localhost:8080"})
+   :host (str "localhost:" (or (System/getenv "PORT") "8080"))})
