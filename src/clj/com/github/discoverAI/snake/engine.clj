@@ -32,7 +32,7 @@
   (-> (vector-add snake-head direction)
       (modulo-vector board)))
 
-(def MOVE_UPDATE_INTERVAL 1000)
+(def MOVE_UPDATE_INTERVAL 100)
 
 (defn game-over? [game-state]
   (not (apply distinct?
