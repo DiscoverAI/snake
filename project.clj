@@ -3,7 +3,7 @@
 
 (def java-opts (if (= (System/getProperty "java.version") "10") ["--add-modules" "java.xml.bind"] []))
 
-(defproject com.github.discoverAI/snake "0.1.0-SNAPSHOT"
+(defproject com.github.discoverAI/snake "0.1.0"
   :description "A Clojure/ClojureScript Snake game for your browser"
   :url "https://github.com/DiscoverAI/snake"
   :license {:name "MIT"}
