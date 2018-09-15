@@ -12,7 +12,7 @@
             [taoensso.sente :as sente]
             [com.github.discoverAI.snake.engine :as eg]))
 
-(defn handle-register-request [{:keys [engine]} request]
+#_(defn handle-register-request [{:keys [engine]} request]
   (let [p (:params request)]
     {:status  200
      :headers {"content-type" "application/json"}
@@ -23,7 +23,7 @@
                                           (Integer/parseInt (:snake-length p))
                                           (fn []))})}))
 
-(defn handle-move-request [{:keys [engine]} request]
+#_(defn handle-move-request [{:keys [engine]} request]
   (let [p (:params request)
         id (:id p)
         x-dir (:x p)
@@ -47,12 +47,12 @@
      :headers {"content-type" "application/json"}
      :body    (json/write-str (get @(:games engine) (keyword (:id params))))}))
 
-(defn endpoint-filter [register-handler move-handler get-game-handler]
+(defn endpoint-filter [ get-game-handler]
   (cc/routes
-    (cc/POST "/register/" req (register-handler req))
-    (cc/POST "/register" req (register-handler req))
-    (cc/POST "/move/" req (move-handler req))
-    (cc/POST "/move" req (move-handler req))
+    ;(cc/POST "/register/" req (register-handler req))
+    ;(cc/POST "/register" req (register-handler req))
+    ;(cc/POST "/move/" req (move-handler req))
+    ;(cc/POST "/move" req (move-handler req))
     (cc/GET "/games/:id" req (get-game-handler req))
     (cc/GET "/games/:id/" req (get-game-handler req))
     (cc/GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
@@ -63,8 +63,8 @@
 
 (defn create-routes [self]
   (->> (endpoint-filter
-         (timed-handler handle-register-request self)
-         (timed-handler handle-move-request self)
+         #_(timed-handler handle-register-request self)
+         #_(timed-handler handle-move-request self)
          (timed-handler handle-get-game-request self))
        kparams/wrap-keyword-params
        params/wrap-params))

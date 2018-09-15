@@ -4,7 +4,7 @@
 
 (def CLIENT_CONFIG
   {:type :auto
-   :host "discoverai-snake-staging.herokuapp.com:80"})
+   :host "localhost:8080"})
 
 (let [{:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket! ws/INIT_ROUTE CLIENT_CONFIG)]
   (def chsk chsk)

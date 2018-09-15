@@ -71,30 +71,28 @@
     (swap! games-state assoc-in direction-path
            (new-direction-vector current-dir direction))))
 
-(defn update-game-state! [games-atom game-id callback-fn timer-tasks]
+(defn update-game-state! [games-atom game-id callback-fn]
   (if (game-over? (game-id @games-atom))
-    (do (at-at/stop (get @timer-tasks game-id))
-        (swap! games-atom update game-id end-game))
+    (swap! games-atom update game-id end-game)
     (swap! games-atom update game-id make-move))
-  (callback-fn (game-id @games-atom))
-  (game-id @games-atom))
+  (callback-fn (game-id @games-atom)))
 
-(defn register-new-game-without-timer [{:keys [games]} width height snake-length callback-fn]
+(defn- schedule-game-update [games-atom scheduler game-id callback-fn]
+  (at-at/every MOVE_UPDATE_INTERVAL
+               #(update-game-state! games-atom game-id callback-fn)
+               (scheduler/pool scheduler)
+               :desc (str "Update game " game-id)))
+
+(defn- register-scheduled-job [scheduled-job game-id game-id->scheduled-job-id]
+  (swap! game-id->scheduled-job-id assoc game-id scheduled-job))
+
+(defn register-new-game [{:keys [games scheduler game-id->scheduled-job-id]} width height snake-length callback-fn]
   (let [game (new-game width height snake-length)
         game-id (first (keys game))]
     (swap! games merge game)
+    (-> (schedule-game-update games scheduler game-id callback-fn)
+        (register-scheduled-job game-id game-id->scheduled-job-id))
     game-id))
-
-(defn register-new-game [engine width height snake-length callback-fn]
-  (let [new-game-id (register-new-game-without-timer
-                      engine width height snake-length callback-fn)
-        {:keys [games scheduler game-timer-tasks]} engine]
-    (swap! (:game-timer-tasks engine) assoc new-game-id
-           (at-at/every MOVE_UPDATE_INTERVAL
-                        #(update-game-state! games new-game-id callback-fn game-timer-tasks)
-                        (scheduler/pool scheduler)
-                        :desc "UpdateGameStateTask"))
-    new-game-id))
 
 (defn games-state-status [games-state-atom]
   (if (and (map? @games-state-atom) (<= 0 (count @games-state-atom)))
@@ -107,7 +105,9 @@
     (log/info "-> starting Engine")
     (let [games-state (atom {})]
       (as/register-status-fun app-status (partial games-state-status games-state))
-      (assoc self :games games-state :game-timer-tasks (atom {}))))
+      (assoc self
+        :games games-state
+        :game-id->scheduled-job-id (atom {}))))
   (stop [_]
     (log/info "<- stopping Engine")))
 

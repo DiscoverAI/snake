@@ -18,16 +18,14 @@
 
 (def game-20-20-3-id :foobar)
 
-(def lost-game-id :you-loose)
-
-(def lost-game
-   {:board [20 20]
-    :score 0
-    :tokens {:snake {:position  [[11 10] [10 10] [10 9] [11 9] [11 10]]
-                     :direction [1 0]
-                     :speed     1.0}
-             :food  {:position [[1 2]]}}
-    :game-over false})
+(def game-head-on-tail
+  {:board     [20 20]
+   :score     0
+   :tokens    {:snake {:position  [[11 10] [10 10] [10 9] [11 9] [11 10]]
+                       :direction [1 0]
+                       :speed     1.0}
+               :food  {:position [[1 2]]}}
+   :game-over false})
 
 (deftest game-id-test
   (testing "Should calculate a unique game id"
@@ -56,43 +54,40 @@
                 (eg/new-game 21 19 7))))))
 
 (deftest register-new-game-test
-  (testing "Should add a new game to component and register move function with scheduler"
-    (let [moved? (atom false)]
-      (with-redefs [b/random-vector (constantly [1 2])
-                    eg/game-id (fn [game-state]
+  (let [moved? (atom false)]
+    (with-redefs [b/random-vector (constantly [1 2])
+                  eg/game-id (fn [game-state]
+                               (is (= game-20-20-3 game-state))
+                               game-20-20-3-id)
+                  eg/make-move (fn [game-state]
                                  (is (= game-20-20-3 game-state))
-                                 game-20-20-3-id)
-                    eg/make-move (fn [game-state]
-                                   (is (= game-20-20-3 game-state))
-                                   (reset! moved? true)
-                                   game-state)]
+                                 (reset! moved? true)
+                                 game-state)]
+
+      (testing "Should add a new game to component and register move function with scheduler"
         (tu/with-started [system (co/snake-system {})]
-                         (is (not= nil
-                                   (:engine system)))
                          (is (= game-20-20-3-id
                                 (eg/register-new-game (:engine system) 20 20 3 (constantly nil))))
                          (is (= game-20-20-3
                                 (game-20-20-3-id @(get-in system [:engine :games]))))
-                         (is (not (nil? (game-20-20-3-id @(get-in system [:engine :game-timer-tasks])))))
-                         (tu/eventually (is (= true @moved?))))))))
+                         (is (not (nil? (game-20-20-3-id @(get-in system [:engine :game-id->scheduled-job-id])))))
+                         (tu/eventually (true? @moved?) 2000 200))))))
 
-(deftest test-concat-to-head
+(deftest test-concat-to-snake-head
   (testing "On a tick, the snake should move one pixel into the given direction"
     (is (= [1 4]
-           (eg/concat-to-snake-head [1 2] [0 2] [9 9])))))
+           (eg/concat-to-snake-head [1 2] [0 2] [9 9]))))
 
-(deftest test-concat-to-head
-  (testing "On a tick, the snake should move one pixel into the given direction and appear on left side of board"
+  (testing "should move snake head not outside of game field"
     (is (= [1 1]
            (eg/concat-to-snake-head [9 1] [1 0] [9 9])))))
 
-(deftest test-new-direction
-  (testing "On attempt to turn the snake 180° around or in the same direction the direction vector should stay the same"
+(deftest test-new-direction-vector
+  (testing "turning into the same direction/opposite should do nothing"
     (is (= [1 0] (eg/new-direction-vector [1 0] [-1 0])))
-    (is (= [1 0] (eg/new-direction-vector [1 0] [1 0])))))
+    (is (= [1 0] (eg/new-direction-vector [1 0] [1 0]))))
 
-(deftest test-new-direction
-  (testing "On a valid direction update, the direction is updated"
+  (testing "turn direction"
     (is (= [0 1] (eg/new-direction-vector [1 0] [0 1])))
     (is (= [0 -1] (eg/new-direction-vector [1 0] [0 -1])))))
 
@@ -168,54 +163,34 @@
                                           :food  {:position [[0 0]]}}})))))
 
 (deftest change-direction-test
-  (let [game-state-atom (atom {:foobar {:tokens {:snake {:position  [13 37]
-                                                         :direction [1 0]
-                                                         :speed     1.0}}}})]
-    (eg/change-direction game-state-atom :foobar [0 -1])
-    (is (= {:foobar {:tokens {:snake {:position  [13 37]
-                                      :direction [0 -1]
-                                      :speed     1.0}}}}
-           @game-state-atom))))
+  (testing "should update game state with new direction"
+    (let [game-state-atom (atom {:foobar {:tokens {:snake {:position  [13 37]
+                                                           :direction [1 0]
+                                                           :speed     1.0}}}})]
+      (eg/change-direction game-state-atom :foobar [0 -1])
 
+      (is (= {:foobar {:tokens {:snake {:position  [13 37]
+                                        :direction [0 -1]
+                                        :speed     1.0}}}}
+             @game-state-atom)))))
 
 (deftest game-over?-test
-  (testing "if game over is returned when snake overlaps"
+  (testing "game over is returned when snake overlaps"
     (is (= true (eg/game-over? {:tokens {:snake {:position [[0 0] [1 0] [2 0] [2 1] [1 1] [1 0]]}}})))
-    (is (= true (eg/game-over? lost-game)))
-    (is (= false (eg/game-over? {:tokens {:snake {:position [[14 12] [13 12] [12 12]]}}})))))
+    (is (= true (eg/game-over? game-head-on-tail)))
+    (is (= false (eg/game-over? game-20-20-3)))))
 
+(deftest update-game-state!-test
+  (let [games (atom {:foo            game-head-on-tail
+                     game-20-20-3-id game-20-20-3})]
+    (testing "should set given game over when game lost"
+      (is (not (get-in @games [:foo :game-over])))
+      (eg/update-game-state! games :foo (constantly nil))
+      (is (get-in @games [:foo :game-over])))
 
-
-(deftest update-game-state!-test-lost-game
-  (testing "If game is updated correctly on a lost game"
-    (with-redefs [
-                  eg/game-id (fn [_] lost-game-id)
-                  eg/new-game (fn [_,_,_] {lost-game-id lost-game})]
-      (tu/with-started [system (co/snake-system {})]
-                       (is (not= nil (:engine system)))
-                       (is (= lost-game-id
-                              (eg/register-new-game (:engine system) 20 20 3 (constantly nil))))
-                       (is (= (assoc lost-game :game-over true)
-                              (eg/update-game-state! (get-in system [:engine :games])
-                                                     lost-game-id
-                                                     (fn [_])
-                                                     (get-in system [:engine :game-timer-tasks]))))
-                       (is (nil? (get @(get-in system [:engine :game-timer-tasks]) game-20-20-3-id)))))))
-
-(deftest update-game-state!-test-valid-game
-  (testing "If game is updated correctly on an ongoing game"
-    (with-redefs [
-                  eg/game-id (fn [_] game-20-20-3-id)
-                  eg/new-game (fn [_,_,_] {game-20-20-3-id game-20-20-3})
-                  overtone.at-at/every (fn [_,_,_,_,_] :fake-timer)]
-
-      (tu/with-started [system (co/snake-system {})]
-                       (is (not= nil (:engine system)))
-                       (is (= game-20-20-3-id
-                              (eg/register-new-game (:engine system) 20 20 3 (constantly nil))))
-                       (is (= (eg/make-move game-20-20-3)
-                              (eg/update-game-state! (get-in system [:engine :games])
-                                                     game-20-20-3-id
-                                                     (fn [_])
-                                                     (get-in system [:engine :game-timer-tasks]))))
-                       (is (= (:fake-timer (get @(get-in system [:engine :game-timer-tasks]) game-20-20-3-id))))))))
+    (testing "should move snake when not game over"
+      (is (not (get-in @games [game-20-20-3-id :game-over])))
+      (eg/update-game-state! games game-20-20-3-id (constantly nil))
+      (is (not (get-in @games [game-20-20-3-id :game-over])))
+      (is (not= game-20-20-3
+                (game-20-20-3-id @games))))))
