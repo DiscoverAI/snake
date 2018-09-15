@@ -71,15 +71,17 @@
     (swap! games-state assoc-in direction-path
            (new-direction-vector current-dir direction))))
 
-(defn update-game-state! [games-atom game-id callback-fn]
+(defn update-game-state! [games-atom game-id->scheduled-job-id-atom game-id callback-fn]
   (if (game-over? (game-id @games-atom))
-    (swap! games-atom update game-id end-game)
+    (do (swap! games-atom update game-id end-game)
+        (at-at/stop (game-id @game-id->scheduled-job-id-atom))
+        (swap! game-id->scheduled-job-id-atom dissoc game-id))
     (swap! games-atom update game-id make-move))
   (callback-fn (game-id @games-atom)))
 
-(defn- schedule-game-update [games-atom scheduler game-id callback-fn]
+(defn- schedule-game-update [games-atom scheduler game-id game-id->scheduled-job-id-atom callback-fn]
   (at-at/every MOVE_UPDATE_INTERVAL
-               #(update-game-state! games-atom game-id callback-fn)
+               #(update-game-state! games-atom game-id->scheduled-job-id-atom game-id callback-fn)
                (scheduler/pool scheduler)
                :desc (str "Update game " game-id)))
 
@@ -90,7 +92,7 @@
   (let [game (new-game width height snake-length)
         game-id (first (keys game))]
     (swap! games merge game)
-    (-> (schedule-game-update games scheduler game-id callback-fn)
+    (-> (schedule-game-update games scheduler game-id game-id->scheduled-job-id callback-fn)
         (register-scheduled-job game-id game-id->scheduled-job-id))
     game-id))
 

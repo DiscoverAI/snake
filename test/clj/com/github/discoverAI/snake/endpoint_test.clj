@@ -3,9 +3,7 @@
 ;            [com.github.discoverAI.snake.core :as co]
 ;            [de.otto.tesla.util.test-utils :as tu]
 ;            [com.github.discoverAI.snake.engine :as eg]
-;            [com.github.discoverAI.snake.endpoint :as e]
-;            [com.github.discoverAI.snake.board :as b]
-;            [com.github.discoverAI.snake.engine-test :as egt]
+;            [com.github.discoverAI.snake.endpoint :as ep]
 ;            [clojure.data.json :as json]))
 ;
 ;(def mock-register-request
@@ -39,7 +37,7 @@
 ;                       (is (= {:status  200
 ;                               :headers {"content-type" "application/json"}
 ;                               :body    (json/write-str {:game-id :abc123})}
-;                              (e/handle-register-request system mock-register-request)))))))
+;                              (ep/handle-register-request system mock-register-request)))))))
 ;
 ;(deftest move-handler-test
 ;  (testing "If a new game is registered on the register request handler"
@@ -48,7 +46,7 @@
 ;                     (is (= {:body    (json/write-str (eg/make-move fake-game-state))
 ;                             :headers {"content-type" "application/json"}
 ;                             :status  200}
-;                            (e/handle-move-request
+;                            (ep/handle-move-request
 ;                              system
 ;                              mock-move-request))))))
 ;
@@ -59,6 +57,6 @@
 ;                     (is (= {:body    (json/write-str fake-game-state)
 ;                             :headers {"content-type" "application/json"}
 ;                             :status  200}
-;                            (e/handle-get-game-request
+;                            (ep/handle-get-game-request
 ;                              system
 ;                              mock-get-game-request))))))

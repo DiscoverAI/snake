@@ -5,7 +5,8 @@
             [com.github.discoverAI.snake.engine :as eg]
             [clojure.string :as s]
             [com.github.discoverAI.snake.board-test :as bt]
-            [com.github.discoverAI.snake.board :as b]))
+            [com.github.discoverAI.snake.board :as b]
+            [overtone.at-at :as at-at]))
 
 (def game-20-20-3
   {:board     [20 20]
@@ -182,15 +183,19 @@
 
 (deftest update-game-state!-test
   (let [games (atom {:foo            game-head-on-tail
-                     game-20-20-3-id game-20-20-3})]
-    (testing "should set given game over when game lost"
-      (is (not (get-in @games [:foo :game-over])))
-      (eg/update-game-state! games :foo (constantly nil))
-      (is (get-in @games [:foo :game-over])))
+                     game-20-20-3-id game-20-20-3})
+        scheduled-jobs (atom {:foo 1337})]
+    (with-redefs [at-at/stop (fn [id]
+                               (is (= 1337 id)))]
+      (testing "should set given game over when game lost"
+        (is (not (get-in @games [:foo :game-over])))
+        (eg/update-game-state! games scheduled-jobs :foo (constantly nil))
+        (is (get-in @games [:foo :game-over]))
+        (is (empty? @scheduled-jobs))))
 
     (testing "should move snake when not game over"
       (is (not (get-in @games [game-20-20-3-id :game-over])))
-      (eg/update-game-state! games game-20-20-3-id (constantly nil))
+      (eg/update-game-state! games nil game-20-20-3-id (constantly nil))
       (is (not (get-in @games [game-20-20-3-id :game-over])))
       (is (not= game-20-20-3
                 (game-20-20-3-id @games))))))
