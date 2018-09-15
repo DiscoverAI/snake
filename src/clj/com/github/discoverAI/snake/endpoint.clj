@@ -12,33 +12,15 @@
             [taoensso.sente :as sente]
             [com.github.discoverAI.snake.engine :as eg]))
 
-#_(defn handle-register-request [{:keys [engine]} request]
-  (let [p (:params request)]
-    {:status  200
-     :headers {"content-type" "application/json"}
-     :body    (json/write-str {:game-id (eg/register-new-game-without-timer
-                                          engine
-                                          (Integer/parseInt (:width p))
-                                          (Integer/parseInt (:height p))
-                                          (Integer/parseInt (:snake-length p))
-                                          (fn []))})}))
-
-#_(defn handle-move-request [{:keys [engine]} request]
-  (let [p (:params request)
-        id (:id p)
-        x-dir (:x p)
-        y-dir (:y p)]
-    (eg/change-direction (:games engine)
-                         (keyword id)
-                         [(Integer/parseInt x-dir)
-                          (Integer/parseInt y-dir)])
-    {:status  200
-     :headers {"content-type" "application/json"}
-     :body    (json/write-str (eg/update-game-state!
-                                (:games engine)
-                                (keyword id)
-                                (fn [_])
-                                (:game-timer-tasks engine)))}))
+(defn handle-post-game-request [{:keys [engine]} {:keys [params]}]
+  {:status  201
+   :headers {"content-type" "application/json"}
+   :body    (json/write-str {:gameId (eg/register-new-game
+                                        engine
+                                        (read-string (:width params))
+                                        (read-string (:height params))
+                                        (read-string (:snakeLength params))
+                                        (fn []))})})
 
 (defn handle-get-game-request [{:keys [engine]} {:keys [params]}]
   (if (nil? (get @(:games engine) (keyword (:id params))))
@@ -47,12 +29,10 @@
      :headers {"content-type" "application/json"}
      :body    (json/write-str (get @(:games engine) (keyword (:id params))))}))
 
-(defn endpoint-filter [ get-game-handler]
+(defn endpoint-filter [post-game-handler get-game-handler]
   (cc/routes
-    ;(cc/POST "/register/" req (register-handler req))
-    ;(cc/POST "/register" req (register-handler req))
-    ;(cc/POST "/move/" req (move-handler req))
-    ;(cc/POST "/move" req (move-handler req))
+    (cc/POST "/games/" req (post-game-handler req))
+    (cc/POST "/games" req (post-game-handler req))
     (cc/GET "/games/:id" req (get-game-handler req))
     (cc/GET "/games/:id/" req (get-game-handler req))
     (cc/GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
@@ -63,8 +43,7 @@
 
 (defn create-routes [self]
   (->> (endpoint-filter
-         #_(timed-handler handle-register-request self)
-         #_(timed-handler handle-move-request self)
+         (timed-handler handle-post-game-request self)
          (timed-handler handle-get-game-request self))
        kparams/wrap-keyword-params
        params/wrap-params))
