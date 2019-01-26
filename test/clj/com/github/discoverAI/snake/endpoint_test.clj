@@ -40,3 +40,11 @@
                                          :foo)]
       (let [add-game-result (ep/add-game-handler system {:body-params {:width 10 :height 5 :snakeLength 4}})]
         (is (= 201 (:status add-game-result)))))))
+
+(deftest test-change-dir-handler
+  (testing "should change direction"
+    (with-redefs [eg/change-direction (fn [games id direction]
+                                        (is (= :foo id))
+                                        (is (= [0 1] direction))
+                                        (is (= {:foo fake-game-state} @games)))]
+       (ep/change-dir-handler system {:params {:direction [0 1] :id "foo"}}))))

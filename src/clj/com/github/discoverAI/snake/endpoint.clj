@@ -48,11 +48,9 @@
     (ok game)
     (not-found)))
 
-(defn change-dir-handler [engine {body :body-params} {:keys [params]}]
-  (log/info "BODY" body)
-  (log/info "PARAMS" params)
-  (eg/change-direction (:games engine) (:id params) (:direction body))
-  (get @(:games engine) (:id params)))
+(defn change-dir-handler [engine {:keys [params]}]
+  (if (get @(:games engine) (keyword (:id params)))
+    (eg/change-direction (:games engine) (keyword (:id params)) (:direction params))))
 
 (defn app [engine]
   (api
@@ -80,7 +78,12 @@
          :get  {:summary   "gets a game state"
                 :responses {ok {:schema Game}}
                 :handler   (partial get-game-handler engine)}}))
-
+    (context "/games/:id/tokens/snake/direction" []
+      (resource
+        {:tags ["games"]
+         :put  {:summary   "changes snake direction in game"
+                :parameters {:body-params DirectionChange}
+                :handler   (partial change-dir-handler engine)}}))
 
     (GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
     (POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))
