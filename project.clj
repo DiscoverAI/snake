@@ -23,6 +23,8 @@
                  [de.otto/tesla-httpkit "1.0.1"]
                  [org.clojure/tools.logging "0.4.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
+                 [metosin/compojure-api "1.1.11"]
+                 [yada "1.2.15"]
                  [hiccup "1.0.5"]]
 
   :plugins [[lein-cljsbuild "1.1.5"]

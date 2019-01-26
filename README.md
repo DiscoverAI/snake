@@ -8,6 +8,9 @@ Interact with your keyboard or with its api.
 The purpose of this game is to be used as a test bed for running
 Reinforcement Learning algorithms.
 
+## REST Api
+The API is documented in code and can be explored under `/api-doc`
+
 ## Development Mode
 
 ### Run Frontend

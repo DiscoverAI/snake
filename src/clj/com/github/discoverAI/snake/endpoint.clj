@@ -1,58 +1,95 @@
 (ns com.github.discoverAI.snake.endpoint
   (:require [com.stuartsierra.component :as c]
             [clojure.tools.logging :as log]
-            [clojure.data.json :as json]
             [de.otto.tesla.stateful.handler :as handler]
-            [ring.middleware.params :as params]
-            [ring.middleware.keyword-params :as kparams]
-            [de.otto.goo.goo :as metrics]
             [compojure.core :as cc]
             [com.github.discoverAI.snake.websocket-config :as ws-config]
             [com.github.discoverAI.snake.websocket-api :as ws-api]
             [taoensso.sente :as sente]
+            [compojure.api.sweet :refer :all]
+            [schema.core :as s]
+            [ring.util.http-response :refer :all]
             [com.github.discoverAI.snake.engine :as eg]))
 
-(defn handle-post-game-request [{:keys [engine]} {:keys [params]}]
-  {:status  201
-   :headers {"content-type" "application/json"}
-   :body    (json/write-str {:gameId (eg/register-new-game
-                                        engine
-                                        (read-string (:width params))
-                                        (read-string (:height params))
-                                        (read-string (:snakeLength params))
-                                        (fn []))})})
+(s/defschema GameInitialization
+  {:width       s/Int
+   :height      s/Int
+   :snakeLength s/Int})
 
-(defn handle-get-game-request [{:keys [engine]} {:keys [params]}]
-  (if (nil? (get @(:games engine) (keyword (:id params))))
-    {:status 404}
-    {:status  200
-     :headers {"content-type" "application/json"}
-     :body    (json/write-str (get @(:games engine) (keyword (:id params))))}))
+(s/defschema Game
+  {:board  [s/Int]
+   :score  s/Int
+   :tokens {:snake {:position  [[s/Int]]
+                    :direction [s/Int] :speed [s/Num]
+                    :food      {:position [[s/Int]]}}}})
 
-(defn endpoint-filter [post-game-handler get-game-handler]
-  (cc/routes
-    (cc/POST "/games/" req (post-game-handler req))
-    (cc/POST "/games" req (post-game-handler req))
-    (cc/GET "/games/:id" req (get-game-handler req))
-    (cc/GET "/games/:id/" req (get-game-handler req))
-    (cc/GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
-    (cc/POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))
+(s/defschema DirectionChange
+  {:direction [s/Int]})
 
-(defn- timed-handler [handler self]
-  (metrics/timing-middleware (partial handler self)))
+(s/defschema GameId
+  {:game-id s/Str})
 
-(defn create-routes [self]
-  (->> (endpoint-filter
-         (timed-handler handle-post-game-request self)
-         (timed-handler handle-get-game-request self))
-       kparams/wrap-keyword-params
-       params/wrap-params))
+(defn location-for-game-id [gameid]
+  ; TODO: get port from config? Is there an easier way of returning the location?
+  (str (.. java.net.InetAddress getLocalHost getHostName) ":8080/games/" (name gameid)))
+
+(defn add-game-handler [engine {body :body-params}]
+  (let [game-id (eg/register-new-game
+                  engine
+                  (:width body)
+                  (:height body)
+                  (:snakeLength body)
+                  (fn []))]
+    (created (location-for-game-id game-id)
+             {:gameId game-id})))
+
+(defn get-game-handler [engine {:keys [params]}]
+  (if-let [game (get @(:games engine) (keyword (:id params)))]
+    (ok game)
+    (not-found)))
+
+(defn change-dir-handler [engine {body :body-params} {:keys [params]}]
+  (log/info "BODY" body)
+  (log/info "PARAMS" params)
+  (eg/change-direction (:games engine) (:id params) (:direction body))
+  (get @(:games engine) (:id params)))
+
+(defn app [engine]
+  (api
+    {:swagger
+     {:ui   "/api-docs"
+      :spec "/swagger.json"
+      :data {:info     {:title       "Snake API"
+                        :description "This rest api for snake is intended for use in Machine learning clients."}
+             :tags     [{:name "api", :description "game apis"}]
+             :consumes ["application/json"]
+             :produces ["application/json"]}}}
+
+    (context "/games" []
+      (resource
+        {:tags ["games"]
+         :post {:summary    "add's a game"
+                :parameters {:body-params GameInitialization}
+                :responses  {created {:schema      GameId
+                                      :description "the id of the created game"}}
+                :handler    (partial add-game-handler engine)}}))
+
+    (context "/games/:id" []
+      (resource
+        {:tags ["games"]
+         :get  {:summary   "gets a game state"
+                :responses {ok {:schema Game}}
+                :handler   (partial get-game-handler engine)}}))
+
+
+    (GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
+    (POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))
 
 (defrecord Endpoint [handler engine]
   c/Lifecycle
   (start [self]
     (log/info "-> starting Endpoint")
-    (handler/register-handler handler (create-routes self))
+    (handler/register-timed-handler handler (app engine))
     (sente/start-server-chsk-router! ws-api/ch-chsk (fn [event] (ws-api/event-msg-handler engine event)))
     self)
   (stop [_]

@@ -15,28 +15,28 @@
             :food  {:position [[1 2]]}}})
 
 (def system
-  {:engine {:games (atom {:foo fake-game-state})}})
+  {:games (atom {:foo fake-game-state})})
 
 (deftest get-game-handler-test
   (testing "should get existing game"
-    (is (= {:body    (json/write-str fake-game-state)
-            :headers {"content-type" "application/json"}
+    (is (= {:body    fake-game-state
+            :headers {}
             :status  200}
-           (ep/handle-get-game-request system {:params {:id "foo"}}))))
+           (ep/get-game-handler system {:params {:id "foo"}}))))
 
   (testing "should return 404 when game not existing"
-    (is (= {:status 404}
-           (ep/handle-get-game-request system {:params {:id "asd"}})))))
+    (is (= {:body    nil
+            :headers {}
+            :status  404}
+           (ep/get-game-handler system "asd")))))
 
 (deftest post-game-handler-test
   (testing "should create new game"
     (with-redefs [eg/register-new-game (fn [engine width height snake-length _]
-                                         (is (= (:engine system) engine))
+                                         (is (= system engine))
                                          (is (= 10 width))
                                          (is (= 5 height))
                                          (is (= 4 snake-length))
                                          :foo)]
-      (is (= {:body    "{\"gameId\":\"foo\"}"
-              :headers {"content-type" "application/json"}
-              :status  201}
-             (ep/handle-post-game-request system {:params {:width "10" :height "5" :snakeLength "4"}}))))))
+      (let [add-game-result (ep/add-game-handler system {:body-params {:width 10 :height 5 :snakeLength 4}})]
+        (is (= 201 (:status add-game-result)))))))
