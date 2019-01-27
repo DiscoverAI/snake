@@ -39,7 +39,7 @@
                   (:width body)
                   (:height body)
                   (:snakeLength body)
-                  (fn []))]
+                  (fn [_]))]
     (created (location-for-game-id game-id)
              {:gameId game-id})))
 
