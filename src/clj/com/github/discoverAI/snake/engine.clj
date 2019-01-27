@@ -72,12 +72,13 @@
            (new-direction-vector current-dir direction))))
 
 (defn update-game-state! [games-atom game-id->scheduled-job-id-atom game-id callback-fn]
-  (if (game-over? (game-id @games-atom))
-    (do (swap! games-atom update game-id end-game)
-        (at-at/stop (game-id @game-id->scheduled-job-id-atom))
-        (swap! game-id->scheduled-job-id-atom dissoc game-id))
-    (swap! games-atom update game-id make-move))
-  (callback-fn (game-id @games-atom)))
+  (let [new-game-state (if (game-over? (game-id @games-atom))
+                         (do (swap! games-atom update game-id end-game)
+                             (at-at/stop (game-id @game-id->scheduled-job-id-atom))
+                             (swap! game-id->scheduled-job-id-atom dissoc game-id))
+                         (swap! games-atom update game-id make-move))]
+    (callback-fn (game-id @games-atom))
+    (game-id new-game-state)))
 
 (defn- schedule-game-update [games-atom scheduler game-id game-id->scheduled-job-id-atom callback-fn]
   (at-at/every MOVE_UPDATE_INTERVAL
@@ -88,10 +89,14 @@
 (defn- register-scheduled-job [scheduled-job game-id game-id->scheduled-job-id]
   (swap! game-id->scheduled-job-id assoc game-id scheduled-job))
 
-(defn register-new-game [{:keys [games scheduler game-id->scheduled-job-id]} width height snake-length callback-fn]
+(defn register-game-without-timer [games width height snake-length]
   (let [game (new-game width height snake-length)
         game-id (first (keys game))]
     (swap! games merge game)
+    game-id))
+
+(defn register-new-game [{:keys [games scheduler game-id->scheduled-job-id]} width height snake-length callback-fn]
+  (let [game-id (register-game-without-timer games width height snake-length)]
     (-> (schedule-game-update games scheduler game-id game-id->scheduled-job-id callback-fn)
         (register-scheduled-job game-id game-id->scheduled-job-id))
     game-id))

@@ -20,8 +20,10 @@
   {:board  [s/Int]
    :score  s/Int
    :tokens {:snake {:position  [[s/Int]]
-                    :direction [s/Int] :speed [s/Num]
-                    :food      {:position [[s/Int]]}}}})
+                    :direction [s/Int]
+                    :speed     s/Num}
+            :food  {:position [[s/Int]]}}
+   :game-over s/Bool})
 
 (s/defschema DirectionChange
   {:direction [s/Int]})
@@ -34,12 +36,11 @@
   (str (.. java.net.InetAddress getLocalHost getHostName) ":8080/games/" (name gameid)))
 
 (defn add-game-handler [engine {body :body-params}]
-  (let [game-id (eg/register-new-game
-                  engine
+  (let [game-id (eg/register-game-without-timer
+                  (:games engine)
                   (:width body)
                   (:height body)
-                  (:snakeLength body)
-                  (fn [_]))]
+                  (:snakeLength body))]
     (created (location-for-game-id game-id)
              {:gameId game-id})))
 
@@ -48,9 +49,12 @@
     (ok game)
     (not-found)))
 
-(defn change-dir-handler [engine {:keys [params]}]
-  (if (get @(:games engine) (keyword (:id params)))
-    (eg/change-direction (:games engine) (keyword (:id params)) (:direction params))))
+(defn change-dir-handler [engine {:keys [direction]} id]
+  (if (get @(:games engine) (keyword id))
+    (do
+      (eg/change-direction (:games engine) (keyword id) direction)
+      (eg/update-game-state!
+        (:games engine) (:game-id->scheduled-job-id engine) (keyword id) (fn [_])))))
 
 (defn app [engine]
   (api
@@ -62,7 +66,6 @@
              :tags     [{:name "api", :description "game apis"}]
              :consumes ["application/json"]
              :produces ["application/json"]}}}
-
     (context "/games" []
       (resource
         {:tags ["games"]
@@ -70,20 +73,20 @@
                 :parameters {:body-params GameInitialization}
                 :responses  {created {:schema      GameId
                                       :description "the id of the created game"}}
-                :handler    (partial add-game-handler engine)}}))
-
-    (context "/games/:id" []
-      (resource
-        {:tags ["games"]
-         :get  {:summary   "gets a game state"
-                :responses {ok {:schema Game}}
-                :handler   (partial get-game-handler engine)}}))
-    (context "/games/:id/tokens/snake/direction" []
-      (resource
-        {:tags ["games"]
-         :put  {:summary   "changes snake direction in game"
-                :parameters {:body-params DirectionChange}
-                :handler   (partial change-dir-handler engine)}}))
+                :handler    (partial add-game-handler engine)}})
+      (context "/:id" []
+        :path-params [id :- s/Str]
+        (resource
+          {:tags ["games"]
+           :get  {:summary   "gets a game state"
+                  :responses {ok {:schema Game}}
+                  :handler   (partial get-game-handler engine)}})
+        (PUT "/tokens/snake/direction" []
+          :tags ["games"]
+          :summary "changes snake direction in game"
+          :body [dir-change DirectionChange]
+          :return Game
+          (ok (change-dir-handler engine dir-change id)))))
 
     (GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
     (POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))

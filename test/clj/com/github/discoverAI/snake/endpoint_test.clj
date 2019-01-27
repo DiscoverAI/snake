@@ -3,8 +3,7 @@
             [com.github.discoverAI.snake.core :as co]
             [de.otto.tesla.util.test-utils :as tu]
             [com.github.discoverAI.snake.engine :as eg]
-            [com.github.discoverAI.snake.endpoint :as ep]
-            [clojure.data.json :as json]))
+            [com.github.discoverAI.snake.endpoint :as ep]))
 
 (def fake-game-state
   {:board  [20 20]
@@ -22,7 +21,7 @@
     (is (= {:body    fake-game-state
             :headers {}
             :status  200}
-           (ep/get-game-handler system {:params {:id "foo"}}))))
+           (ep/get-game-handler system {:params {:id :foo}}))))
 
   (testing "should return 404 when game not existing"
     (is (= {:body    nil
@@ -43,8 +42,12 @@
 
 (deftest test-change-dir-handler
   (testing "should change direction"
-    (with-redefs [eg/change-direction (fn [games id direction]
-                                        (is (= :foo id))
-                                        (is (= [0 1] direction))
-                                        (is (= {:foo fake-game-state} @games)))]
-       (ep/change-dir-handler system {:params {:direction [0 1] :id "foo"}}))))
+    (tu/with-started
+      [mock-system (co/snake-system {})]
+      (let [{:keys [gameId]} (:body (ep/add-game-handler (:engine mock-system)
+                                                         {:body-params {:width 20 :height 20 :snakeLength 4}}))
+            created-game (gameId @(get-in mock-system [:engine :games]))
+            direction-changed (assoc-in created-game [:tokens :snake :direction] [0 1])
+            expected-state (eg/make-move direction-changed)]
+        (is (= expected-state
+               (ep/change-dir-handler (:engine mock-system) {:direction [0 1]} gameId)))))))
