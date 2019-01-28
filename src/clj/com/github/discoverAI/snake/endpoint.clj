@@ -2,7 +2,6 @@
   (:require [com.stuartsierra.component :as c]
             [clojure.tools.logging :as log]
             [de.otto.tesla.stateful.handler :as handler]
-            [compojure.core :as cc]
             [com.github.discoverAI.snake.websocket-config :as ws-config]
             [com.github.discoverAI.snake.websocket-api :as ws-api]
             [taoensso.sente :as sente]
