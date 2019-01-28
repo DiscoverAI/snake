@@ -2,6 +2,7 @@
   (:require [com.stuartsierra.component :as c]
             [clojure.tools.logging :as log]
             [de.otto.tesla.stateful.handler :as handler]
+            [compojure.core :as cc]
             [com.github.discoverAI.snake.websocket-config :as ws-config]
             [com.github.discoverAI.snake.websocket-api :as ws-api]
             [taoensso.sente :as sente]
@@ -16,12 +17,12 @@
    :snakeLength s/Int})
 
 (s/defschema Game
-  {:board  [s/Int]
-   :score  s/Int
-   :tokens {:snake {:position  [[s/Int]]
-                    :direction [s/Int]
-                    :speed     s/Num}
-            :food  {:position [[s/Int]]}}
+  {:board     [s/Int]
+   :score     s/Int
+   :tokens    {:snake {:position  [[s/Int]]
+                       :direction [s/Int]
+                       :speed     s/Num}
+               :food  {:position [[s/Int]]}}
    :game-over s/Bool})
 
 (s/defschema DirectionChange
@@ -102,3 +103,6 @@
 
 (defn new-endpoint []
   (map->Endpoint {}))
+
+(defn transform-state-map-to-board-map [state-map]
+  [[1]])

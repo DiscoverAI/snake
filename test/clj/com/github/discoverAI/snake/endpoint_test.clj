@@ -3,8 +3,7 @@
             [com.github.discoverAI.snake.core :as co]
             [de.otto.tesla.util.test-utils :as tu]
             [com.github.discoverAI.snake.engine :as eg]
-            [com.github.discoverAI.snake.endpoint :as ep]
-            [clojure.string :as s]))
+            [com.github.discoverAI.snake.endpoint :as ep]))
 
 (def fake-game-state
   {:board  [20 20]
@@ -30,22 +29,16 @@
             :status  404}
            (ep/get-game-handler system "asd")))))
 
-(def mock-game-id :foo)
-
 (deftest post-game-handler-test
   (testing "should create new game"
-    (with-redefs [eg/register-game-without-timer (fn [engine width height snake-length]
-                                                   (is (= @(:games system) @engine))
-                                                   (is (= 10 width))
-                                                   (is (= 5 height))
-                                                   (is (= 4 snake-length))
-                                                   mock-game-id)]
+    (with-redefs [eg/register-new-game (fn [engine width height snake-length _]
+                                         (is (= system engine))
+                                         (is (= 10 width))
+                                         (is (= 5 height))
+                                         (is (= 4 snake-length))
+                                         :foo)]
       (let [add-game-result (ep/add-game-handler system {:body-params {:width 10 :height 5 :snakeLength 4}})]
-        (is (= 201 (:status add-game-result)))
-
-        (is (s/ends-with?
-              (get-in add-game-result [:headers "Location"])
-              (str ":8080/games/" (name mock-game-id))))))))
+        (is (= 201 (:status add-game-result)))))))
 
 (deftest test-change-dir-handler
   (testing "should change direction"
@@ -58,3 +51,14 @@
             expected-state (eg/make-move direction-changed)]
         (is (= expected-state
                (ep/change-dir-handler (:engine mock-system) {:direction [0 1]} gameId)))))))
+
+(deftest test-transform-state-map-to-boardstate
+  (testing "should take a state map and return a board state"
+    (is (= [[1]]
+           (ep/transform-state-map-to-board-map {:board [1 1]
+                                                 :score 0
+                                                 :tokens {:snake {:position [[0 0]]}}})))))
+    ;(is (= [[1 0]]
+    ;       (ep/transform-state-map-to-board-map {:board [2 1]
+    ;                                             :score 0
+    ;                                             :tokens {:snake {:position [[0 0]]}}})))))
