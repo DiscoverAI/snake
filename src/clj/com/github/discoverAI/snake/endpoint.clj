@@ -105,4 +105,14 @@
   (map->Endpoint {}))
 
 (defn transform-state-map-to-board-map [state-map]
-  [[1]])
+  "Transforms the board state into a more suitable format for machine learning.
+  The format will be a (width x height) grid, containing integer codes for tokens:
+  1: Snake-Head
+  2: Snake-Body
+  3: Snake-Food"
+  (let [[width height] (:board state-map)]
+    (for [y (range height)]
+      (for [x (range width)]
+        (cond
+          (= [x y] (first (get-in state-map [:tokens :snake :position]))) 1
+          :else 0)))))

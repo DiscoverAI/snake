@@ -55,10 +55,21 @@
 (deftest test-transform-state-map-to-boardstate
   (testing "should take a state map and return a board state"
     (is (= [[1]]
-           (ep/transform-state-map-to-board-map {:board [1 1]
-                                                 :score 0
-                                                 :tokens {:snake {:position [[0 0]]}}})))))
-    ;(is (= [[1 0]]
-    ;       (ep/transform-state-map-to-board-map {:board [2 1]
-    ;                                             :score 0
-    ;                                             :tokens {:snake {:position [[0 0]]}}})))))
+           (ep/transform-state-map-to-board-map {:board  [1 1]
+                                                 :score  0
+                                                 :tokens {:snake {:position [[0 0]]}}})))
+    (is (= [[1 0]]
+           (ep/transform-state-map-to-board-map {:board  [2 1]
+                                                 :score  0
+                                                 :tokens {:snake {:position [[0 0]]}}})))
+    (is (= [[1 0]
+            [0 0]]
+           (ep/transform-state-map-to-board-map {:board  [2 2]
+                                                 :score  0
+                                                 :tokens {:snake {:position [[0 0]]}}})))
+    (is (= [[0 0 0]
+            [0 1 0]
+            [0 0 0]]
+           (ep/transform-state-map-to-board-map {:board  [3 3]
+                                                 :score  0
+                                                 :tokens {:snake {:position [[1 1]]}}})))))
