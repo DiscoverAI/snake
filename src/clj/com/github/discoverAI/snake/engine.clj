@@ -107,7 +107,7 @@
     (conj (game-id game-id->spectators) uid)))
 
 (defn register-spectator [{:keys [game-id->spectators]} uid game-id]
-  (swap! game-id->spectators add-spectator uid game-id))
+  (swap! game-id->spectators add-spectator uid (keyword game-id)))
 
 (defn games-state-status [games-state-atom]
   (if (and (map? @games-state-atom) (<= 0 (count @games-state-atom)))

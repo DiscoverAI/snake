@@ -9,6 +9,9 @@
             [de.otto.goo.goo :as metrics]
             [compojure.api.sweet :refer :all]))
 
+(defn pass-game-id-if-present [game-id]
+  (if (not (nil? game-id)) (str \" game-id \")))
+
 (defn frontend-page [game-id]
   (page/html5
     {:lang "en"}
@@ -17,17 +20,20 @@
      (page/include-css "/css/snake.css")]
     [:body [:div#app]
      (page/include-js "/js/compiled/app.js")
-     [:script (str "com.github.discoverAI.snake.core.init(\"" game-id "\");")]]))
+     [:script (str "com.github.discoverAI.snake.core.init("
+                   (pass-game-id-if-present game-id)
+                   ");")]]))
 
-(defn response [self request]
-  (let [gameid (get-in request [:headers "spectate-game-id"])]
-    {:status  200
-     :headers {"content-type" "text/html"}
-     :body    (frontend-page gameid)}))
+(defn response [game-id]
+  {:status  200
+   :headers {"content-type" "text/html"}
+   :body    (frontend-page game-id)})
 
-(defn endpoint-filter [handler]
+(defn endpoint-filter [_handler]
   (api
-    (GET "/" req (handler req))))
+    (GET "/" []
+      :query-params [{spectate-game-id :- String nil}]
+      (response spectate-game-id))))
 
 (defn with-resource [handler]
   (resource/wrap-resource handler "public"))
