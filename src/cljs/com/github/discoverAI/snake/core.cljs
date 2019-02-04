@@ -16,7 +16,7 @@
   (reagent/render [views/base-template]
                   (.getElementById js/document "app")))
 
-(defn ^:export init []
-  (re-frame/dispatch-sync [::events/initialize-db])
+(defn ^:export init [game-id]
+  (re-frame/dispatch-sync [::events/initialize-db game-id])
   (dev-setup)
   (mount-root))

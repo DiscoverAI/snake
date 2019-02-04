@@ -3,7 +3,8 @@
             [com.github.discoverAI.snake.core :as co]
             [de.otto.tesla.util.test-utils :as tu]
             [com.github.discoverAI.snake.engine :as eg]
-            [com.github.discoverAI.snake.endpoint :as ep]))
+            [com.github.discoverAI.snake.endpoint :as ep]
+            [com.github.discoverAI.snake.websocket-api :as ws-api]))
 
 (def fake-game-state
   {:board  [20 20]
@@ -13,8 +14,12 @@
                     :speed     1.0}
             :food  {:position [[1 2]]}}})
 
+(def fake-spectator-id
+  "spectator-id-from-websockets-library")
+
 (def system
-  {:games (atom {:foo fake-game-state})})
+  {:games (atom {:foo fake-game-state})
+   :game-id->spectators (atom {:foo [fake-spectator-id]})})
 
 (deftest get-game-handler-test
   (testing "should get existing game"
@@ -62,3 +67,11 @@
     ;       (ep/transform-state-map-to-board-map {:board [2 1]
     ;                                             :score 0
     ;                                             :tokens {:snake {:position [[0 0]]}}})))))
+
+(deftest test-notify-spectators
+  (testing "if spectator notify works"
+    (with-redefs [ws-api/push-game-state-to-client
+                  (fn [client-id game-state]
+                    (is (= fake-spectator-id client-id))
+                    (is (= fake-game-state game-state)))]
+      (ep/notify-spectators system {:game-id :foo}))))

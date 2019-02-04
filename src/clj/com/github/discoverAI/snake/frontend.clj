@@ -7,9 +7,9 @@
             [ring.middleware.keyword-params :as kparams]
             [ring.middleware.resource :as resource]
             [de.otto.goo.goo :as metrics]
-            [compojure.core :as cc]))
+            [compojure.api.sweet :refer :all]))
 
-(defn frontend-page []
+(defn frontend-page [game-id]
   (page/html5
     {:lang "en"}
     [:head
@@ -17,16 +17,17 @@
      (page/include-css "/css/snake.css")]
     [:body [:div#app]
      (page/include-js "/js/compiled/app.js")
-     [:script "com.github.discoverAI.snake.core.init();"]]))
+     [:script (str "com.github.discoverAI.snake.core.init(\"" game-id "\");")]]))
 
-(defn response [_ _]
-  {:status  200
-   :headers {"content-type" "text/html"}
-   :body    (frontend-page)})
+(defn response [self request]
+  (let [gameid (get-in request [:headers "spectate-game-id"])]
+    {:status  200
+     :headers {"content-type" "text/html"}
+     :body    (frontend-page gameid)}))
 
 (defn endpoint-filter [handler]
-  (cc/routes
-    (cc/GET "/" req (handler req))))
+  (api
+    (GET "/" req (handler req))))
 
 (defn with-resource [handler]
   (resource/wrap-resource handler "public"))

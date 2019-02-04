@@ -25,6 +25,9 @@
    68 [1 0]
    83 [0 1]})
 
+(def spectate-game
+  (fn [game-id callback] (chsk-send! [::spectate-game game-id] 3000 callback)))
+
 (defn send-key-pressed [game-id keycode]
   (if (some #{keycode} (keys KEY_CODE->DIRECTION_VECTOR))
     (chsk-send! [::key-pressed {:game-id game-id :direction (get KEY_CODE->DIRECTION_VECTOR keycode)}])))

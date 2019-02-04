@@ -49,12 +49,19 @@
     (ok game)
     (not-found)))
 
+(defn notify-spectators [engine {:keys [game-id]}]
+  (doseq [spectator-id (game-id @(:game-id->spectators engine))]
+    (ws-api/push-game-state-to-client
+      spectator-id
+      (game-id @(:games engine)))))
+
 (defn change-dir-handler [engine {:keys [direction]} id]
   (if (get @(:games engine) (keyword id))
     (do
       (eg/change-direction (:games engine) (keyword id) direction)
       (eg/update-game-state!
-        (:games engine) (:game-id->scheduled-job-id engine) (keyword id) (fn [_])))))
+        (:games engine) (:game-id->scheduled-job-id engine) (keyword id)
+        (partial notify-spectators engine)))))
 
 (defn app [engine]
   (api
