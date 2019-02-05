@@ -77,7 +77,7 @@
                              (at-at/stop (game-id @game-id->scheduled-job-id-atom))
                              (swap! game-id->scheduled-job-id-atom dissoc game-id))
                          (swap! games-atom update game-id make-move))]
-    (callback-fn (game-id @games-atom))
+    (callback-fn (merge {:game-id game-id} (game-id @games-atom)))
     (game-id new-game-state)))
 
 (defn- schedule-game-update [games-atom scheduler game-id game-id->scheduled-job-id-atom callback-fn]
@@ -101,6 +101,14 @@
         (register-scheduled-job game-id game-id->scheduled-job-id))
     game-id))
 
+(defn add-spectator [game-id->spectators uid game-id]
+  (assoc game-id->spectators
+    game-id
+    (conj (game-id game-id->spectators) uid)))
+
+(defn register-spectator [{:keys [game-id->spectators]} uid game-id]
+  (swap! game-id->spectators add-spectator uid (keyword game-id)))
+
 (defn games-state-status [games-state-atom]
   (if (and (map? @games-state-atom) (<= 0 (count @games-state-atom)))
     (st/status-detail :engine :ok (str (count @games-state-atom) " games registered"))
@@ -114,7 +122,8 @@
       (as/register-status-fun app-status (partial games-state-status games-state))
       (assoc self
         :games games-state
-        :game-id->scheduled-job-id (atom {}))))
+        :game-id->scheduled-job-id (atom {})
+        :game-id->spectators (atom {}))))
   (stop [_]
     (log/info "<- stopping Engine")))
 

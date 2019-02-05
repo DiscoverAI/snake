@@ -35,3 +35,8 @@
   [{:keys [?data ?reply-fn uid]} engine]
   (?reply-fn (eg/register-new-game engine (:width ?data) (:height ?data) (:snake-length ?data)
                                    (partial push-game-state-to-client uid))))
+
+(defmethod -event-msg-handler
+  ::spectate-game
+  [{:keys [?data ?reply-fn uid]} engine]
+  (?reply-fn (eg/register-spectator engine uid ?data)))

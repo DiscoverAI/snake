@@ -15,7 +15,7 @@
   :jvm-opts ~java-opts
 
   :dependencies [[org.clojure/clojure "1.9.0"]
-                 [org.clojure/clojurescript "1.10.145"]
+                 [org.clojure/clojurescript "1.10.439"]
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]
                  [com.taoensso/sente "1.12.0"]

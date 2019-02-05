@@ -74,6 +74,8 @@ main {
   height: 40 * $spacer;
   text-align: center;
   background: white;
+  display:flex;
+  justify-content: center;
   border: 1px solid $border-color;
 }
 

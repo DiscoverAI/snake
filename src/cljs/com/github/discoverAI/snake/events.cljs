@@ -5,8 +5,20 @@
             [taoensso.sente :as sente]
             [taoensso.encore :refer-macros (have)]))
 
-(defn init-db [_db _event]
-  db/default-db)
+(defn init-db [_db [_event game-id]]
+  (if (not (nil? game-id))
+    (db/start-game (db/register-game db/default-db game-id))
+    db/default-db))
+
+(defn send-spectate-request [db _event]
+  (if (and (= db/started (:state db)) (not (nil? (:game-id db))))
+    (ws-api/spectate-game (:game-id db)
+                          (fn [_] (println "spectate registered"))))
+  db)
+
+(re-frame/reg-event-db
+  ::socket-connection-ready
+  send-spectate-request)
 
 (re-frame/reg-event-db
   ::initialize-db
@@ -63,8 +75,9 @@
 
 (defmethod -event-msg-handler :chsk/state
   [{:keys [?data]}]
-  (let [[new-state-map] (have vector? ?data)]
-    (if (:first-open? new-state-map)
+  (if (:first-open? (second ?data))
+    (do
+      (re-frame/dispatch [::socket-connection-ready])
       (println "Channel socket successfully established!"))))
 
 (defmethod -event-msg-handler :chsk/recv
