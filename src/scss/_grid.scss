@@ -2,24 +2,26 @@
 
 .grid-container {
   margin: $spacer auto;
-  display: grid;
-  width: 24 * 1.5em;
-  grid-template-columns: repeat(24, $grid-field-size);
-  grid-template-rows: repeat(24, $grid-field-size);
-  grid-gap: $grid-gap;
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 
-  .field {
-    height: $grid-field-size;
-    box-shadow: 0 0 0 $grid-gap $grid-gap-color;
-    background-color: white;
-  }
+  .row {
+    display: flex;
+    flex-direction: row;
 
-  .snake {
-    background-color: green !important;
-  }
+    .field {
+      height: $grid-field-size;
+      width: $grid-field-size;
+      box-shadow: 0 0 0 $grid-gap $grid-gap-color;
+      background-color: white;
+    }
 
-  .food {
-    background-color: red !important;
+    .snake {
+      background-color: green !important;
+    }
+
+    .food {
+      background-color: red !important;
+    }
   }
 }
