@@ -54,8 +54,8 @@
             created-game (gameId @(get-in mock-system [:engine :games]))
             direction-changed (assoc-in created-game [:tokens :snake :direction] [0 1])
             expected-state (eg/make-move direction-changed)]
-        (is (= expected-state
-               (ep/change-dir-handler (:engine mock-system) {:direction [0 1]} gameId)))))))
+        (is (= (ep/transform-state-map-to-board-map expected-state)
+               (ep/change-dir-handler (:engine mock-system) {:direction :down} gameId)))))))
 
 (deftest test-transform-state-map-to-boardstate
   (testing "should take a state map and return a board state"
@@ -77,7 +77,20 @@
             [0 0 0]]
            (ep/transform-state-map-to-board-map {:board  [3 3]
                                                  :score  0
-                                                 :tokens {:snake {:position [[1 1]]}}})))))
+                                                 :tokens {:snake {:position [[1 1]]}}})))
+    (is (= [[0 0 0]
+            [0 1 2]
+            [0 0 0]]
+           (ep/transform-state-map-to-board-map {:board  [3 3]
+                                                 :score  0
+                                                 :tokens {:snake {:position [[1 1] [2 1]]}}})))
+    (is (= [[2 2 2]
+            [0 1 2]
+            [3 0 0]]
+           (ep/transform-state-map-to-board-map {:board  [3 3]
+                                                 :score  0
+                                                 :tokens {:snake {:position [[1 1] [2 1] [2 0] [1 0] [0 0]]}
+                                                          :food {:position [[0 2]]}}})))))
 
 (deftest test-notify-spectators
   (testing "if spectator notify works"

@@ -25,8 +25,11 @@
                :food  {:position [[s/Int]]}}
    :game-over s/Bool})
 
+(s/defschema Encoded-Board
+  {:encoded-board     [[s/Int]]})
+
 (s/defschema DirectionChange
-  {:direction [s/Int]})
+  {:direction (s/enum :left :right :up :down)})
 
 (s/defschema GameId
   {:game-id s/Str})
@@ -55,13 +58,35 @@
       spectator-id
       (game-id @(:games engine)))))
 
+(defn lazy-contains? [col key]
+  (some #{key} col))
+
+(defn transform-state-map-to-board-map [state-map]
+  "Transforms the board state into a more suitable format for machine learning.
+  The format will be a (width x height) grid, containing integer codes for tokens:
+  1: Snake-Head
+  2: Snake-Body
+  3: Snake-Food"
+  (let [[width height] (:board state-map)]
+    (for [y (range height)]
+      (for [x (range width)]
+        (cond
+          (= [x y] (first (get-in state-map [:tokens :snake :position]))) 1
+          (lazy-contains? (rest (get-in state-map [:tokens :snake :position])) [x y]) 2
+          (lazy-contains? (get-in state-map [:tokens :food :position]) [x y]) 3
+          :else 0)))))
+
+(def DIRECTION->CHANGE-VECTOR
+  {:left [-1 0] :right [1 0] :up [0 -1] :down [0 1]})
+
 (defn change-dir-handler [engine {:keys [direction]} id]
   (if (get @(:games engine) (keyword id))
     (do
-      (eg/change-direction (:games engine) (keyword id) direction)
-      (eg/update-game-state!
-        (:games engine) (:game-id->scheduled-job-id engine) (keyword id)
-        (partial notify-spectators engine)))))
+      (eg/change-direction (:games engine) (keyword id) (direction DIRECTION->CHANGE-VECTOR))
+      (let [new-game-state (eg/update-game-state!
+                             (:games engine) (:game-id->scheduled-job-id engine) (keyword id)
+                             (partial notify-spectators engine))]
+        (transform-state-map-to-board-map new-game-state)))))
 
 (defn app [engine]
   (api
@@ -92,8 +117,8 @@
           :tags ["games"]
           :summary "changes snake direction in game"
           :body [dir-change DirectionChange]
-          :return Game
-          (ok (change-dir-handler engine dir-change id)))))
+          :return Encoded-Board
+          (ok {:encoded-board (change-dir-handler engine dir-change id)}))))
 
     (GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
     (POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))
@@ -110,16 +135,3 @@
 
 (defn new-endpoint []
   (map->Endpoint {}))
-
-(defn transform-state-map-to-board-map [state-map]
-  "Transforms the board state into a more suitable format for machine learning.
-  The format will be a (width x height) grid, containing integer codes for tokens:
-  1: Snake-Head
-  2: Snake-Body
-  3: Snake-Food"
-  (let [[width height] (:board state-map)]
-    (for [y (range height)]
-      (for [x (range width)]
-        (cond
-          (= [x y] (first (get-in state-map [:tokens :snake :position]))) 1
-          :else 0)))))
