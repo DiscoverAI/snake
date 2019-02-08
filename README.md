@@ -11,6 +11,12 @@ Reinforcement Learning algorithms.
 ## REST Api
 The API is documented in code and can be explored under `/api-doc`
 
+## Spectator mode
+
+You can spectate a game (e.g. played by a machine learning agent) by appending a query parameter:  
+`http://<yourhost>:8080/?spectate-game-id=G_163115905960737`.
+On port 3449 (figwheel) this will not work as your request is not passed through the engine-frontend component, therefore the query parameter can not be intercepted.
+
 ## Development Mode
 
 ### Run Frontend
