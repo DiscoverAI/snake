@@ -26,7 +26,9 @@
    :game-over s/Bool})
 
 (s/defschema Encoded-Board
-  {:encoded-board     [[s/Int]]})
+  {:encoded-board {:game-over s/Bool
+                   :board     [[s/Int]]
+                   :score     s/Int}})
 
 (s/defschema DirectionChange
   {:direction (s/enum :left :right :up :down)})
@@ -67,14 +69,16 @@
   1: Snake-Head
   2: Snake-Body
   3: Snake-Food"
-  (let [[width height] (:board state-map)]
-    (for [y (range height)]
-      (for [x (range width)]
-        (cond
-          (= [x y] (first (get-in state-map [:tokens :snake :position]))) 1
-          (lazy-contains? (rest (get-in state-map [:tokens :snake :position])) [x y]) 2
-          (lazy-contains? (get-in state-map [:tokens :food :position]) [x y]) 3
-          :else 0)))))
+  {:game-over (:game-over state-map)
+   :score     (:score state-map)
+   :board     (let [[width height] (:board state-map)]
+                (for [y (range height)]
+                  (for [x (range width)]
+                    (cond
+                      (= [x y] (first (get-in state-map [:tokens :snake :position]))) 1
+                      (lazy-contains? (rest (get-in state-map [:tokens :snake :position])) [x y]) 2
+                      (lazy-contains? (get-in state-map [:tokens :food :position]) [x y]) 3
+                      :else 0))))})
 
 (def DIRECTION->CHANGE-VECTOR
   {:left [-1 0] :right [1 0] :up [0 -1] :down [0 1]})
