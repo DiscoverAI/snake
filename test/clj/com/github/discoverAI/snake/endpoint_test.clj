@@ -61,54 +61,65 @@
   (testing "should take a state map and return a board state"
     (is (= {:board     [[1]]
             :game-over false
-            :score 0}
+            :ate-food  true
+            :score     0}
            (ep/transform-state-map-to-board-map {:game-over false
                                                  :board     [1 1]
                                                  :score     0
-                                                 :tokens    {:snake {:position [[0 0]]}}})))
+                                                 :tokens    {:snake {:position [[0 0]]}
+                                                             :food  {:position [[0 0]]}}})))
 
-    (is (= {:board     [[1 0]]
+    (is (= {:board     [[1 3]]
             :game-over false
-            :score 0}
+            :ate-food  false
+            :score     0}
            (ep/transform-state-map-to-board-map {:game-over false
                                                  :board     [2 1]
                                                  :score     0
-                                                 :tokens    {:snake {:position [[0 0]]}}})))
-    (is (= {:board     [[1 0] [0 0]]
+                                                 :tokens    {:snake {:position [[0 0]]}
+                                                             :food  {:position [[1 0]]}}})))
+    (is (= {:board     [[1 3] [0 0]]
             :game-over false
-            :score 12}
+            :ate-food  false
+            :score     12}
            (ep/transform-state-map-to-board-map {:game-over false
                                                  :board     [2 2]
                                                  :score     12
-                                                 :tokens    {:snake {:position [[0 0]]}}})))
+                                                 :tokens    {:snake {:position [[0 0]]}
+                                                             :food  {:position [[1 0]]}}})))
     (is (= {:board     [[0 0 0]
                         [0 1 0]
                         [0 0 0]]
             :game-over true
-            :score 42}
+            :ate-food  true
+            :score     42}
            (ep/transform-state-map-to-board-map {:game-over true
                                                  :board     [3 3]
                                                  :score     42
-                                                 :tokens    {:snake {:position [[1 1]]}}})))
-    (is (= {:board     [[0 0 0]
+                                                 :tokens    {:snake {:position [[1 1]]}
+                                                             :food  {:position [[1 1]]}}})))
+    (is (= {:board     [[0 3 0]
                         [0 1 2]
                         [0 0 0]]
             :game-over true
-            :score 33}
+            :ate-food  false
+            :score     33}
            (ep/transform-state-map-to-board-map {:game-over true
                                                  :board     [3 3]
                                                  :score     33
-                                                 :tokens    {:snake {:position [[1 1] [2 1]]}}})))
+                                                 :tokens    {:snake {:position [[1 1] [2 1]]}
+                                                             :food  {:position [[1 0]]}}})))
     (is (= {:board     [[2 2 2]
                         [0 1 2]
-                        [3 0 0]]
+                        [0 0 0]]
             :game-over true
-            :score 12}
+            :ate-food  true
+            :score     12}
            (ep/transform-state-map-to-board-map {:game-over true
                                                  :board     [3 3]
                                                  :score     12
                                                  :tokens    {:snake {:position [[1 1] [2 1] [2 0] [1 0] [0 0]]}
-                                                             :food  {:position [[0 2]]}}})))))
+                                                             :food  {:position [[1 1]]}}})))))
 
 
 (deftest test-notify-spectators

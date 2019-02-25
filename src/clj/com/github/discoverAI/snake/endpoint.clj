@@ -28,7 +28,8 @@
 (s/defschema Encoded-Board
   {:encoded-board {:game-over s/Bool
                    :board     [[s/Int]]
-                   :score     s/Int}})
+                   :score     s/Int
+                   :ate-food s/Bool}})
 
 (s/defschema DirectionChange
   {:direction (s/enum :left :right :up :down)})
@@ -71,6 +72,8 @@
   3: Snake-Food"
   {:game-over (:game-over state-map)
    :score     (:score state-map)
+   :ate-food (= (get-in state-map [:tokens :food :position])
+                [(first (get-in state-map [:tokens :snake :position]))])
    :board     (let [[width height] (:board state-map)]
                 (for [y (range height)]
                   (for [x (range width)]
