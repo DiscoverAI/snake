@@ -73,9 +73,10 @@
 
 (defn update-game-state! [games-atom game-id->scheduled-job-id-atom game-id callback-fn]
   (let [new-game-state (if (game-over? (game-id @games-atom))
-                         (do (swap! games-atom update game-id end-game)
-                             (at-at/stop (game-id @game-id->scheduled-job-id-atom))
-                             (swap! game-id->scheduled-job-id-atom dissoc game-id))
+                         (do
+                           (at-at/stop (game-id @game-id->scheduled-job-id-atom))
+                           (swap! game-id->scheduled-job-id-atom dissoc game-id)
+                           (swap! games-atom update game-id end-game))
                          (swap! games-atom update game-id make-move))]
     (callback-fn (merge {:game-id game-id} (game-id @games-atom)))
     (game-id new-game-state)))

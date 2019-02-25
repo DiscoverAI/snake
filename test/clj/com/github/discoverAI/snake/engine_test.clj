@@ -189,13 +189,18 @@
                                (is (= 1337 id)))]
       (testing "should set given game over when game lost"
         (is (not (get-in @games [:foo :game-over])))
-        (eg/update-game-state! games scheduled-jobs :foo (constantly nil))
+        (let [lost-game (eg/update-game-state! games scheduled-jobs :foo (constantly nil))]
+          (is (:game-over lost-game))
+          (is (= game-head-on-tail
+                (assoc game-head-on-tail :game-over false))))
         (is (get-in @games [:foo :game-over]))
         (is (empty? @scheduled-jobs))))
 
     (testing "should move snake when not game over"
       (is (not (get-in @games [game-20-20-3-id :game-over])))
-      (eg/update-game-state! games nil game-20-20-3-id (constantly nil))
+      (let [updated-game (eg/update-game-state! games nil game-20-20-3-id (constantly nil))]
+        (is (= updated-game
+              (eg/make-move game-20-20-3))))
       (is (not (get-in @games [game-20-20-3-id :game-over])))
       (is (not= game-20-20-3
                 (game-20-20-3-id @games))))))
