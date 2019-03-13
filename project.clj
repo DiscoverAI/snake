@@ -3,7 +3,7 @@
 
 (def java-opts (if (= (System/getProperty "java.version") "10") ["--add-modules" "java.xml.bind"] []))
 
-(defproject com.github.discoverAI/snake "0.1.0-SNAPSHOT"
+(defproject com.github.discoverAI/snake "0.1.1-SNAPSHOT"
   :description "A Clojure/ClojureScript Snake game for your browser"
   :url "https://github.com/DiscoverAI/snake"
   :license {:name "MIT"}
@@ -17,7 +17,7 @@
   :uberjar-name "snake.jar"
 
   :dependencies [[org.clojure/clojure "1.9.0"]
-                 [org.clojure/clojurescript "1.10.145"]
+                 [org.clojure/clojurescript "1.10.439"]
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]
                  [com.taoensso/sente "1.12.0"]
@@ -25,6 +25,7 @@
                  [de.otto/tesla-httpkit "1.0.1"]
                  [org.clojure/tools.logging "0.4.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
+                 [metosin/compojure-api "1.1.11"]
                  [hiccup "1.0.5"]]
 
   :plugins [[lein-cljsbuild "1.1.5"]
@@ -38,6 +39,7 @@
 
   :main ^:skip-aot com.github.discoverAI.snake.core
   :source-paths ["src/clj/" "src/cljc"]
+  :uberjar-name "snake-deploy-standalone.jar"
   :profiles {:uberjar {:aot :all}
              :dev     {:dependencies [[binaryage/devtools "0.9.9"]
                                       [ring/ring-mock "0.3.2"]]
@@ -60,8 +62,8 @@
                                        :asset-path           "js/compiled/out"
                                        :source-map-timestamp true
                                        :preloads             [devtools.preload]
-                                       :external-config      {:devtools/config {:features-to-install :all}}
-                                       }}
+                                       :external-config      {:devtools/config {:features-to-install :all}}}}
+
                        {:id           "min"
                         :source-paths ["src/cljs" "src/cljc"]
                         :compiler     {:main            com.github.discoverAI.snake.core

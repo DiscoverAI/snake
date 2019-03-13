@@ -38,33 +38,33 @@
 
 (deftest initial-state-test
   (testing "initiating 5x5 game board with snake of size 3 in the middle"
-    (is (= {:board  [5 5]
-            :tokens {:snake {:position  [[4 3] [3 3] [2 3]]
-                             :direction [1 0]
-                             :speed     1.0}}}
+    (is (= {:board     [5 5]
+            :score     0
+            :tokens    {:snake {:position  [[4 3] [3 3] [2 3]]
+                                :direction [1 0]
+                                :speed     1.0}}
+            :game-over false}
            (b/initial-state 5 5 3))))
 
   (testing "initiating 3x3 game board with snake of size 2 in the middle"
-    (is (= {:board  [3 3]
-            :tokens {:snake {:position  [[2 2] [1 2]]
-                             :direction [1 0]
-                             :speed     1.0}}}
+    (is (= {:board     [3 3]
+            :score     0
+            :tokens    {:snake {:position  [[2 2] [1 2]]
+                                :direction [1 0]
+                                :speed     1.0}}
+            :game-over false}
            (b/initial-state 3 3 2)))))
 
 (deftest random-exclude
   (testing "should randomly produce a vector without blacklisted numbers"
     (let [called (atom false)]
       (with-redefs [rand-nth (fn [collection]
-                               (is (or (= [0 3 4]
-                                          collection)
-                                       (= [0 1 4]
-                                          collection)
-                                       ))
                                (reset! called true)
+                               (is (not (some #{[1 2]} collection)))
+                               (is (not (some #{[2 3]} collection)))
                                :pseudo-random)]
-        (is (= [[:pseudo-random :pseudo-random]]
+        (is (= :pseudo-random
                (b/random-vector [5 5] [[1 2] [2 3]])))
-
         (is (true? @called))))))
 
 (defn extract-food-position [game-state]

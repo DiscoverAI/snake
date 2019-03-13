@@ -25,7 +25,7 @@
 (defmethod -event-msg-handler
   ::key-pressed
   [{:keys [?data]} {:keys [games]}]
-  (eg/change-direction games :mocked-game-id (:direction ?data)))
+  (eg/change-direction games (:game-id ?data) (:direction ?data)))
 
 (defn push-game-state-to-client [client-id game-state]
   (chsk-send! client-id [:game/update-game-state game-state]))
@@ -35,3 +35,8 @@
   [{:keys [?data ?reply-fn uid]} engine]
   (?reply-fn (eg/register-new-game engine (:width ?data) (:height ?data) (:snake-length ?data)
                                    (partial push-game-state-to-client uid))))
+
+(defmethod -event-msg-handler
+  ::spectate-game
+  [{:keys [?data ?reply-fn uid]} engine]
+  (?reply-fn (eg/register-spectator engine uid ?data)))

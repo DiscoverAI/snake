@@ -1,4 +1,5 @@
-(ns com.github.discoverAI.snake.board)
+(ns com.github.discoverAI.snake.board
+  (:require [clojure.set :as set]))
 
 (defn- median [x]
   (int (Math/ceil (/ x 2))))
@@ -19,18 +20,20 @@
   {:board  [board-width board-height]
    :tokens {:snake {:position  (initial-snake-position snake-length [(median board-width) (median board-height)] [1 0])
                     :direction [1 0]
-                    :speed     1.0}}})
+                    :speed     1.0}}
+   :score  0
+   :game-over false})
 
-(defn- filtered-range [max blacklist]
-  (->> (range max)
-       (remove (set blacklist))))
+(defn- cartesian [v1 v2]
+  (for [x v1
+        y v2]
+    [x y]))
 
 (defn random-vector [[x y] blacklist]
-  (let [blacklist-x (map first blacklist)
-        blacklist-y (map second blacklist)]
-    [[(rand-nth (filtered-range x blacklist-x))
-      (rand-nth (filtered-range y blacklist-y))]]))
+  (rand-nth (vec (set/difference
+                   (set (cartesian (range x) (range y)))
+                   (set blacklist)))))
 
 (defn place-food [game-state]
   (assoc-in game-state [:tokens :food :position]
-            (random-vector (:board game-state) (get-in game-state [:tokens :snake :position]))))
+            [(random-vector (:board game-state) (get-in game-state [:tokens :snake :position]))]))
