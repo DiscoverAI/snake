@@ -14,6 +14,8 @@
   :test-paths ["test/clj" "test/cljs"]
   :jvm-opts ~java-opts
 
+  :uberjar-name "snake.jar"
+
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.439"]
                  [reagent "0.7.0"]

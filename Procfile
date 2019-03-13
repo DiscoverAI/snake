@@ -1,1 +1,1 @@
-web: java -jar target/snake-deploy-standalone.jar
+web: java $JVM_OPTS -cp target/snake.jar clojure.main -m com.github.discoverAI.snake.core
