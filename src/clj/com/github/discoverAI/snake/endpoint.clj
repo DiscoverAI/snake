@@ -16,20 +16,11 @@
    :height      s/Int
    :snakeLength s/Int})
 
-(s/defschema Game
-  {:board     [s/Int]
-   :score     s/Int
-   :tokens    {:snake {:position  [[s/Int]]
-                       :direction [s/Int]
-                       :speed     s/Num}
-               :food  {:position [[s/Int]]}}
-   :game-over s/Bool})
-
 (s/defschema Encoded-Board
-  {:encoded-board {:game-over s/Bool
-                   :board     [[s/Int]]
-                   :score     s/Int
-                   :ate-food s/Bool}})
+  {:game-over s/Bool
+   :board     [[s/Int]]
+   :score     s/Int
+   :ate-food s/Bool})
 
 (s/defschema DirectionChange
   {:direction (s/enum :left :right :up :down)})
@@ -49,17 +40,6 @@
                   (:snakeLength body))]
     (created (location-for-game-id game-id)
              {:gameId game-id})))
-
-(defn get-game-handler [engine {:keys [params]}]
-  (if-let [game (get @(:games engine) (keyword (:id params)))]
-    (ok game)
-    (not-found)))
-
-(defn notify-spectators [engine {:keys [game-id]}]
-  (doseq [spectator-id (game-id @(:game-id->spectators engine))]
-    (ws-api/push-game-state-to-client
-      spectator-id
-      (game-id @(:games engine)))))
 
 (defn lazy-contains? [col key]
   (some #{key} col))
@@ -82,6 +62,17 @@
                       (lazy-contains? (rest (get-in state-map [:tokens :snake :position])) [x y]) 2
                       (lazy-contains? (get-in state-map [:tokens :food :position]) [x y]) 3
                       :else 0))))})
+
+(defn get-game-handler [engine {:keys [params]}]
+  (if-let [game (get @(:games engine) (keyword (:id params)))]
+    (ok (transform-state-map-to-board-map game))
+    (not-found)))
+
+(defn notify-spectators [engine {:keys [game-id]}]
+  (doseq [spectator-id (game-id @(:game-id->spectators engine))]
+    (ws-api/push-game-state-to-client
+      spectator-id
+      (game-id @(:games engine)))))
 
 (def DIRECTION->CHANGE-VECTOR
   {:left [-1 0] :right [1 0] :up [0 -1] :down [0 1]})
@@ -118,14 +109,14 @@
         (resource
           {:tags ["games"]
            :get  {:summary   "gets a game state"
-                  :responses {ok {:schema Game}}
+                  :responses {ok {:schema Encoded-Board}}
                   :handler   (partial get-game-handler engine)}})
         (PUT "/tokens/snake/direction" []
           :tags ["games"]
           :summary "changes snake direction in game"
           :body [dir-change DirectionChange]
           :return Encoded-Board
-          (ok {:encoded-board (change-dir-handler engine dir-change id)}))))
+          (ok (change-dir-handler engine dir-change id)))))
 
     (GET ws-config/INIT_ROUTE req (ws-api/ring-ajax-get-or-ws-handshake req))
     (POST ws-config/INIT_ROUTE req (ws-api/ring-ajax-post req))))

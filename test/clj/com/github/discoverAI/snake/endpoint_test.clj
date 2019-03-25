@@ -23,7 +23,7 @@
 
 (deftest get-game-handler-test
   (testing "should get existing game"
-    (is (= {:body    fake-game-state
+    (is (= {:body    (ep/transform-state-map-to-board-map fake-game-state)
             :headers {}
             :status  200}
            (ep/get-game-handler system {:params {:id :foo}}))))
