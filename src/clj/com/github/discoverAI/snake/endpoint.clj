@@ -44,7 +44,7 @@
 (defn lazy-contains? [col key]
   (some #{key} col))
 
-(defn transform-state-map-to-board-map [state-map]
+(defn transform-state-map-to-board-map [state-map ate-food]
   "Transforms the board state into a more suitable format for machine learning.
   The format will be a (width x height) grid, containing integer codes for tokens:
   1: Snake-Head
@@ -52,8 +52,7 @@
   3: Snake-Food"
   {:game-over (:game-over state-map)
    :score     (:score state-map)
-   :ate-food (= (get-in state-map [:tokens :food :position])
-                [(first (get-in state-map [:tokens :snake :position]))])
+   :ate-food  ate-food
    :board     (let [[width height] (:board state-map)]
                 (for [y (range height)]
                   (for [x (range width)]
@@ -65,7 +64,7 @@
 
 (defn get-game-handler [engine {:keys [params]}]
   (if-let [game (get @(:games engine) (keyword (:id params)))]
-    (ok (transform-state-map-to-board-map game))
+    (ok (transform-state-map-to-board-map game false))
     (not-found)))
 
 (defn notify-spectators [engine {:keys [game-id]}]
@@ -77,14 +76,20 @@
 (def DIRECTION->CHANGE-VECTOR
   {:left [-1 0] :right [1 0] :up [0 -1] :down [0 1]})
 
+(defn ate-food? [old-state new-state]
+  (= (:score old-state) (- (:score new-state) 1)))
+
 (defn change-dir-handler [engine {:keys [direction]} id]
   (if (get @(:games engine) (keyword id))
     (do
       (eg/change-direction (:games engine) (keyword id) (direction DIRECTION->CHANGE-VECTOR))
-      (let [new-game-state (eg/update-game-state!
+
+      (let [old-game-state (get @(:games engine) (keyword id))
+            new-game-state (eg/update-game-state!
                              (:games engine) (:game-id->scheduled-job-id engine) (keyword id)
                              (partial notify-spectators engine))]
-        (transform-state-map-to-board-map new-game-state)))))
+        (transform-state-map-to-board-map new-game-state
+                                          (ate-food? old-game-state new-game-state))))))
 
 (defn app [engine]
   (api

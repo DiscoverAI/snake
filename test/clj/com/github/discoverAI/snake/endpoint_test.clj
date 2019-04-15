@@ -23,7 +23,7 @@
 
 (deftest get-game-handler-test
   (testing "should get existing game"
-    (is (= {:body    (ep/transform-state-map-to-board-map fake-game-state)
+    (is (= {:body    (ep/transform-state-map-to-board-map fake-game-state false)
             :headers {}
             :status  200}
            (ep/get-game-handler system {:params {:id :foo}}))))
@@ -54,7 +54,7 @@
             created-game (gameId @(get-in mock-system [:engine :games]))
             direction-changed (assoc-in created-game [:tokens :snake :direction] [0 1])
             expected-state (eg/make-move direction-changed)]
-        (is (= (ep/transform-state-map-to-board-map expected-state)
+        (is (= (ep/transform-state-map-to-board-map expected-state false)
                (ep/change-dir-handler (:engine mock-system) {:direction :down} gameId)))))))
 
 (deftest test-transform-state-map-to-boardstate
@@ -67,7 +67,7 @@
                                                  :board     [1 1]
                                                  :score     0
                                                  :tokens    {:snake {:position [[0 0]]}
-                                                             :food  {:position [[0 0]]}}})))
+                                                             :food  {:position [[0 0]]}}} true)))
 
     (is (= {:board     [[1 3]]
             :game-over false
@@ -77,7 +77,7 @@
                                                  :board     [2 1]
                                                  :score     0
                                                  :tokens    {:snake {:position [[0 0]]}
-                                                             :food  {:position [[1 0]]}}})))
+                                                             :food  {:position [[1 0]]}}} false)))
     (is (= {:board     [[1 3] [0 0]]
             :game-over false
             :ate-food  false
@@ -86,7 +86,7 @@
                                                  :board     [2 2]
                                                  :score     12
                                                  :tokens    {:snake {:position [[0 0]]}
-                                                             :food  {:position [[1 0]]}}})))
+                                                             :food  {:position [[1 0]]}}} false)))
     (is (= {:board     [[0 0 0]
                         [0 1 0]
                         [0 0 0]]
@@ -97,7 +97,7 @@
                                                  :board     [3 3]
                                                  :score     42
                                                  :tokens    {:snake {:position [[1 1]]}
-                                                             :food  {:position [[1 1]]}}})))
+                                                             :food  {:position [[1 1]]}}} true)))
     (is (= {:board     [[0 3 0]
                         [0 1 2]
                         [0 0 0]]
@@ -108,7 +108,7 @@
                                                  :board     [3 3]
                                                  :score     33
                                                  :tokens    {:snake {:position [[1 1] [2 1]]}
-                                                             :food  {:position [[1 0]]}}})))
+                                                             :food  {:position [[1 0]]}}} false)))
     (is (= {:board     [[2 2 2]
                         [0 1 2]
                         [0 0 0]]
@@ -119,7 +119,7 @@
                                                  :board     [3 3]
                                                  :score     12
                                                  :tokens    {:snake {:position [[1 1] [2 1] [2 0] [1 0] [0 0]]}
-                                                             :food  {:position [[1 1]]}}})))))
+                                                             :food  {:position [[1 1]]}}} true)))))
 
 
 (deftest test-notify-spectators

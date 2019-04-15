@@ -104,7 +104,8 @@
   (testing "does not drop last node when the head is on a food"
     (with-redefs [clojure.core/drop-last (fn [_] (throw (Exception. "No no no")))]
       (eg/make-move {:board  [4 4]
-                     :tokens {:snake {:position [[0 0] [1 0] [2 0]]}
+                     :tokens {:snake {:position [[1 0] [2 0] [3 0]]
+                                      :direction [-1 0]}
                               :food  {:position [[0 0]]}}
                      :score  1})))
 
@@ -139,13 +140,13 @@
   (testing "snake is on food and should grow and food disappear and respawn"
     (let [moved-game-state (eg/make-move {:board  [4 4]
                                           :score  42
-                                          :tokens {:snake {:position  [[3 0] [2 0] [1 0]]
+                                          :tokens {:snake {:position  [[2 0] [1 0] [0 0]]
                                                            :direction [1 0]
                                                            :speed     1.0}
                                                    :food  {:position [[3 0]]}}})]
       (is (= {:board  [4 4]
               :score  43
-              :tokens {:snake {:position  [[0 0] [3 0] [2 0] [1 0]]
+              :tokens {:snake {:position  [[3 0] [2 0] [1 0] [0 0]]
                                :direction [1 0]
                                :speed     1.0}}}
              (bt/without-food-position moved-game-state)))
