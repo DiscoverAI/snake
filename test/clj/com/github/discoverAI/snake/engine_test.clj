@@ -206,7 +206,6 @@
       (is (not= game-20-20-3
                 (game-20-20-3-id @games))))))
 
-(def spectator-system)
 
 (deftest register-spectator-test
   (testing "if spectators are registered"
