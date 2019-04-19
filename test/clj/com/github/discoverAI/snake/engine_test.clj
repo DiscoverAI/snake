@@ -206,11 +206,11 @@
       (is (not= game-20-20-3
                 (game-20-20-3-id @games))))))
 
-(def spectator-system
-  {:game-id->spectators (atom {})})
+(def spectator-system)
 
 (deftest register-spectator-test
   (testing "if spectators are registered"
-    (eg/register-spectator spectator-system "spectator-id" :foobar)
-    (is (= @(:game-id->spectators spectator-system)
-           {:foobar ["spectator-id"]}))))
+    (let [spectator-system  {:game-id->spectators (atom {})}]
+     (eg/register-spectator spectator-system "spectator-id" :foobar)
+     (is (= @(:game-id->spectators spectator-system)
+           {:foobar ["spectator-id"]})))))

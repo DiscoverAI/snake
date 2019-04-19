@@ -83,7 +83,6 @@
   (if (get @(:games engine) (keyword id))
     (do
       (eg/change-direction (:games engine) (keyword id) (direction DIRECTION->CHANGE-VECTOR))
-
       (let [old-game-state (get @(:games engine) (keyword id))
             new-game-state (eg/update-game-state!
                              (:games engine) (:game-id->scheduled-job-id engine) (keyword id)

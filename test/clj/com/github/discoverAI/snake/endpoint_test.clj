@@ -55,7 +55,9 @@
             direction-changed (assoc-in created-game [:tokens :snake :direction] [0 1])
             expected-state (eg/make-move direction-changed)]
         (is (= (ep/transform-state-map-to-board-map expected-state false)
-               (ep/change-dir-handler (:engine mock-system) {:direction :down} gameId)))))))
+               (ep/change-dir-handler (:engine mock-system) {:direction :down} gameId)))
+        (with-redefs [eg/update-game-state! (fn [_ _ _ _] (assoc-in expected-state [:score] 1))]
+         (is (:ate-food (ep/change-dir-handler (:engine mock-system) {:direction :up} gameId))))))))
 
 (deftest test-transform-state-map-to-boardstate
   (testing "should take a state map and return a board state"
