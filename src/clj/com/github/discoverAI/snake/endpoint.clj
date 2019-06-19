@@ -31,7 +31,7 @@
 
 (defn location-for-game-id [gameid]
   ; TODO: get port from config? Is there an easier way of returning the location?
-  (str (.. java.net.InetAddress getLocalHost getHostName) ":8080/games/" (name gameid)))
+  (str "http://localhost:8080/games/" (name gameid)))
 
 (defn add-game-handler [engine {body :body-params}]
   (let [game-id (goo/measured-execution "register game without timer"
