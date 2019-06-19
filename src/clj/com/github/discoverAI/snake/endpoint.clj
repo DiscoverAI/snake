@@ -9,7 +9,8 @@
             [compojure.api.sweet :refer :all]
             [schema.core :as s]
             [ring.util.http-response :refer :all]
-            [com.github.discoverAI.snake.engine :as eg]))
+            [com.github.discoverAI.snake.engine :as eg]
+            [de.otto.goo.goo :as goo]))
 
 (s/defschema GameInitialization
   {:width       s/Int
@@ -20,7 +21,7 @@
   {:game-over s/Bool
    :board     [[s/Int]]
    :score     s/Int
-   :ate-food s/Bool})
+   :ate-food  s/Bool})
 
 (s/defschema DirectionChange
   {:direction (s/enum :left :right :up :down)})
@@ -33,11 +34,12 @@
   (str (.. java.net.InetAddress getLocalHost getHostName) ":8080/games/" (name gameid)))
 
 (defn add-game-handler [engine {body :body-params}]
-  (let [game-id (eg/register-game-without-timer
-                  (:games engine)
-                  (:width body)
-                  (:height body)
-                  (:snakeLength body))]
+  (let [game-id (goo/measured-execution "register game without timer"
+                                        eg/register-game-without-timer
+                                        (:games engine)
+                                        (:width body)
+                                        (:height body)
+                                        (:snakeLength body))]
     (created (location-for-game-id game-id)
              {:gameId game-id})))
 
