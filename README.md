@@ -13,7 +13,7 @@ The API is documented in code and can be explored under `/api-doc`
 
 ## Spectator mode
 
-You can spectate a game (e.g. played by a machine learning agent) by appending a query parameter:  
+You can spectate a game (e.g. played by a machine learning agent) by appending a query parameter:
 `http://<yourhost>:8080/?spectate-game-id=G_163115905960737`.
 On port 3449 (figwheel) this will not work as your request is not passed through the engine-frontend component, therefore the query parameter can not be intercepted.
 
@@ -44,7 +44,12 @@ To compile clojurescript to javascript:
 ```bash
 lein clean
 lein cljsbuild once min
-```  
+```
+
+To create standalone jar:
+```bash
+lein uberjar
+```
 
 ## Test
 To run the frontend and the backend tests:
@@ -62,16 +67,16 @@ lein doo once
 ```
 This will run all tests that are passed within `test/snake/test_runner.cljs`.
 
-The tests will be executed with phantom.js. By default the phantom.js binary found in 
+The tests will be executed with phantom.js. By default the phantom.js binary found in
 `./dev-resources` will be used to execute the tests. The shipped version of phantom.js
 only works for linux.
 If you want to specify a custom phantom.js binary (e.g. you are working with MacOS and
 need another phantom.js binary) export a environment variable `PHANTOMJSBIN` which has
-the path to your custom phantom.js binary. 
+the path to your custom phantom.js binary.
 
 For example:
 ```bash
-export PHANTOMJSBIN="phantomjs" && lein doo once 
+export PHANTOMJSBIN="phantomjs" && lein doo once
 ```
 
 ### Backend tests
