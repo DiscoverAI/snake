@@ -31,6 +31,10 @@ jobs:
           key: cache-{{ checksum "project.clj" }}
           paths:
             - ~/.m2
+      - persist_to_workspace:
+          root: ~/.m2
+          paths:
+            - ./.m2
 
   backend-test:
     working_directory: ~/repo
