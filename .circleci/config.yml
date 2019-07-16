@@ -34,17 +34,17 @@ jobs:
 
   backend-test:
     working_directory: ~/repo
-      docker:
-          - image: circleci/clojure:openjdk-11-lein-2.9.1
-      environment:
-        LEIN_ROOT: nbd
-        JVM_OPTS: -Xmx3200m
-      steps:
-        - attach_workspace:
-            at: ~/
-        - run:
-            name: run backend tests
-            command: lein run test
+    docker:
+        - image: circleci/clojure:openjdk-11-lein-2.9.1
+    environment:
+      LEIN_ROOT: nbd
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: run backend tests
+          command: lein run test
 
 workflows:
   version: 2
