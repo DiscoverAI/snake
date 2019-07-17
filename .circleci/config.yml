@@ -75,6 +75,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: replace clients api url
+          command: sed -i 's#localhost:8080#discoverai-snake-staging.herokuapp.com#g' src/cljs/com/github/discoverAI/snake/websocket_api.cljs
+      - run:
           name: package in uberjar
           command: lein uberjar
 
