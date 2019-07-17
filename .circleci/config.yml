@@ -115,6 +115,20 @@ jobs:
       - run: docker login --username=_ --password=$DOCKER_PASSWORD registry.heroku.com
       - run: docker build -t registry.heroku.com/discoverai-snake-staging/web .
       - run: docker push registry.heroku.com/discoverai-snake-staging/web
+      - run:
+          name: release image
+          command: |
+            curl -n -X PATCH https://api.heroku.com/apps/discoverai-snake-staging/formation \
+              -d '{
+              "updates": [
+                {
+                  "type": "web",
+                  "docker_image": "$(docker inspect registry.heroku.com/discoverai-snake-staging/web --format={{.Id}})"
+                },
+              ]
+            }' \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/vnd.heroku+json; version=3.docker-releases"
 
 workflows:
   version: 2
