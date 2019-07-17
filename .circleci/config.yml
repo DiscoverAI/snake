@@ -106,7 +106,7 @@ jobs:
           paths:
             - repo/target/snake-deploy-standalone.jar
 
-  dockerize-staging:
+  dockerize-and-deploy-staging:
     machine: true
     working_directory: ~/repo
     steps:
@@ -124,6 +124,30 @@ jobs:
                 {
                   "type": "web",
                   "docker_image": "$(docker inspect registry.heroku.com/discoverai-snake-staging/web --format={{.Id}})"
+                },
+              ]
+            }' \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/vnd.heroku+json; version=3.docker-releases"
+
+  dockerize-and-deploy-production:
+    machine: true
+    working_directory: ~/repo
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run: docker login --username=_ --password=$DOCKER_PASSWORD registry.heroku.com
+      - run: docker build -t registry.heroku.com/discoverai-snake-live/web .
+      - run: docker push registry.heroku.com/discoverai-snake-live/web
+      - run:
+          name: release image
+          command: |
+            curl -n -X PATCH https://api.heroku.com/apps/discoverai-snake-live/formation \
+              -d '{
+              "updates": [
+                {
+                  "type": "web",
+                  "docker_image": "$(docker inspect registry.heroku.com/discoverai-snake-live/web --format={{.Id}})"
                 },
               ]
             }' \
@@ -148,10 +172,16 @@ workflows:
           requires:
             - backend-test
             - frontend-test
-      - uberjar-prod:
-          requires:
-            - backend-test
-            - frontend-test
-      - dockerize-staging:
+      - dockerize-and-deploy-staging:
           requires:
             - uberjar-staging
+      - uberjar-prod:
+          requires:
+            - dockerize-and-deploy-staging
+      - hold:
+          type: approval
+          requires:
+            - uberjar-prod
+      - dockerize-and-deploy-production:
+            requires:
+              - hold
