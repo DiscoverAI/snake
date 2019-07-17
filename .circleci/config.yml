@@ -112,7 +112,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - run: docker login -u "_" -p "$DOCKER_PASS" registry.heroku.com
+      - run: echo "$DOCKER_PASS" | docker login --username _ --password-stdin registry.heroku.com
       - run: docker build -t registry.heroku.com/discoverai-snake-staging/web .
       - run: docker push registry.heroku.com/discoverai-snake-staging/web
       - run:
