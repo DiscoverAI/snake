@@ -64,7 +64,7 @@ jobs:
           name: run frontend tests
           command: lein doo once
 
-  uberjar:
+  uberjar-staging:
     working_directory: ~/repo
     docker:
         - image: circleci/clojure:openjdk-11-lein-2.9.1
@@ -80,6 +80,31 @@ jobs:
       - run:
           name: package in uberjar
           command: lein uberjar
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - repo/target/snake-deploy-standalone.jar
+
+  uberjar-prod:
+    working_directory: ~/repo
+    docker:
+        - image: circleci/clojure:openjdk-11-lein-2.9.1
+    environment:
+      LEIN_ROOT: nbd
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: replace clients api url
+          command: sed -i 's#localhost:8080#discoverai-snake-live.herokuapp.com#g' src/cljs/com/github/discoverAI/snake/websocket_api.cljs
+      - run:
+          name: package in uberjar
+          command: lein do clean, uberjar
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - repo/target/snake-deploy-standalone.jar
 
 workflows:
   version: 2
@@ -95,7 +120,7 @@ workflows:
       - frontend-test:
           requires:
             - build
-      - uberjar:
+      - uberjar-staging:
           requires:
             - backend-test
             - frontend-test
