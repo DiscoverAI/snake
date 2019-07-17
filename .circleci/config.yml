@@ -134,6 +134,10 @@ workflows:
           requires:
             - backend-test
             - frontend-test
+      - uberjar-prod:
+          requires:
+            - backend-test
+            - frontend-test
       - dockerize-staging:
           requires:
             - uberjar-staging
