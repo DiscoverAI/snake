@@ -26,7 +26,7 @@ jobs:
           key: cache-{{ checksum "project.clj" }}
       - run:
           name: Install dependencies
-          command: lein deps && ll ~/
+          command: lein deps && ls -all ~/
       - save_cache:
           key: cache-{{ checksum "project.clj" }}
           paths:
