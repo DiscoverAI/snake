@@ -1,6 +1,6 @@
 # Snake
 
-[![Build Status](https://travis-ci.org/DiscoverAI/snake.svg?branch=master)](https://travis-ci.org/DiscoverAI/snake)
+[![CircleCI](https://circleci.com/gh/DiscoverAI/snake.svg?style=svg)](https://circleci.com/gh/DiscoverAI/snake)
 
 A [re-frame](https://github.com/Day8/re-frame) Snake game for the browser.
 Interact with your keyboard or with its api.
