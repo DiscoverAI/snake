@@ -27,6 +27,9 @@ jobs:
       - run:
           name: Install dependencies
           command: lein deps
+      - run:
+          name: list folders
+          command: ls -all ~/ && ls -all ~/repo
       - save_cache:
           key: cache-{{ checksum "project.clj" }}
           paths:
