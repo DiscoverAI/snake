@@ -37,7 +37,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - ./repo
+            - ./
 
   backend-test:
     working_directory: ~/repo
