@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/DiscoverAI/snake.svg?style=svg)](https://circleci.com/gh/DiscoverAI/snake)
 
 A [re-frame](https://github.com/Day8/re-frame) Snake game for the browser.
-Interact with your keyboard or with its api.
+Interact with your keyboard or with its api. You can see a running version of this at https://discoverai-snake-live.herokuapp.com/.
 
 The purpose of this game is to be used as a test bed for running
 Reinforcement Learning algorithms.
