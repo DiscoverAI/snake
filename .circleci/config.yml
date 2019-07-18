@@ -146,7 +146,7 @@ jobs:
           echo "machine git.heroku.com" >> ~/.netrc
           echo "  login $DOCKER_USER" >> ~/.netrc
           echo "  password $DOCKER_PASS" >> ~/.netrc
-      - run: heroku container:release web -a discoverai-snake-staging
+      - run: heroku container:release web -a discoverai-snake-live
 
 workflows:
   version: 2
