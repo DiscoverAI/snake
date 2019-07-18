@@ -115,20 +115,17 @@ jobs:
       - run: echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin registry.heroku.com
       - run: docker build -t registry.heroku.com/discoverai-snake-staging/web .
       - run: docker push registry.heroku.com/discoverai-snake-staging/web
+      - run: curl https://cli-assets.heroku.com/install.sh | sh
       - run:
-          name: release image
+          name: login heroku
           command: |
-            curl -n -X PATCH https://api.heroku.com/apps/discoverai-snake-staging/formation \
-              -d '{
-              "updates": [
-                {
-                  "type": "web",
-                  "docker_image": "$(docker inspect registry.heroku.com/discoverai-snake-staging/web --format={{.Id}})"
-                },
-              ]
-            }' \
-              -H "Content-Type: application/json" \
-              -H "Accept: application/vnd.heroku+json; version=3.docker-releases"
+            echo "machine api.heroku.com" > ~/.netrc
+            echo "  login $DOCKER_USER" >> ~/.netrc
+            echo "  password $DOCKER_PASS" >> ~/.netrc
+            echo "machine git.heroku.com" >> ~/.netrc
+            echo "  login $DOCKER_USER" >> ~/.netrc
+            echo "  password $DOCKER_PASS" >> ~/.netrc
+      - run: heroku container:release web -a discoverai-snake-staging
 
   dockerize-and-deploy-production:
     machine: true
@@ -139,20 +136,17 @@ jobs:
       - run: echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin registry.heroku.com
       - run: docker build -t registry.heroku.com/discoverai-snake-live/web .
       - run: docker push registry.heroku.com/discoverai-snake-live/web
+      - run: curl https://cli-assets.heroku.com/install.sh | sh
       - run:
-          name: release image
-          command: |
-            curl -n -X PATCH https://api.heroku.com/apps/discoverai-snake-live/formation \
-              -d '{
-              "updates": [
-                {
-                  "type": "web",
-                  "docker_image": "$(docker inspect registry.heroku.com/discoverai-snake-live/web --format={{.Id}})"
-                },
-              ]
-            }' \
-              -H "Content-Type: application/json" \
-              -H "Accept: application/vnd.heroku+json; version=3.docker-releases"
+        name: login heroku
+        command: |
+          echo "machine api.heroku.com" > ~/.netrc
+          echo "  login $DOCKER_USER" >> ~/.netrc
+          echo "  password $DOCKER_PASS" >> ~/.netrc
+          echo "machine git.heroku.com" >> ~/.netrc
+          echo "  login $DOCKER_USER" >> ~/.netrc
+          echo "  password $DOCKER_PASS" >> ~/.netrc
+      - run: heroku container:release web -a discoverai-snake-staging
 
 workflows:
   version: 2
