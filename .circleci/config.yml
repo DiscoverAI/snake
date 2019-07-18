@@ -138,14 +138,14 @@ jobs:
       - run: docker push registry.heroku.com/discoverai-snake-live/web
       - run: curl https://cli-assets.heroku.com/install.sh | sh
       - run:
-        name: login heroku
-        command: |
-          echo "machine api.heroku.com" > ~/.netrc
-          echo "  login $DOCKER_USER" >> ~/.netrc
-          echo "  password $DOCKER_PASS" >> ~/.netrc
-          echo "machine git.heroku.com" >> ~/.netrc
-          echo "  login $DOCKER_USER" >> ~/.netrc
-          echo "  password $DOCKER_PASS" >> ~/.netrc
+          name: login heroku
+          command: |
+            echo "machine api.heroku.com" > ~/.netrc
+            echo "  login $DOCKER_USER" >> ~/.netrc
+            echo "  password $DOCKER_PASS" >> ~/.netrc
+            echo "machine git.heroku.com" >> ~/.netrc
+            echo "  login $DOCKER_USER" >> ~/.netrc
+            echo "  password $DOCKER_PASS" >> ~/.netrc
       - run: heroku container:release web -a discoverai-snake-live
 
 workflows:
