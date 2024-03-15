@@ -1,0 +1,27 @@
+/* button.css */
+@import url("variables.css");
+
+.btn {
+    cursor: pointer;
+    color: #fff;
+    background-color: var(--yellow-400);
+    display: inline-block;
+    user-select: none;
+    font-weight: var(--font-weight-normal);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    border-radius: calc(var(--font-size-base) / 4);
+    padding: .375rem .75rem;
+    font-size: calc(1.5 * var(--font-size-base));
+    line-height: var(--line-height-base);
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    outline: none;
+}
+
+.btn:hover {
+    color: white;
+    background-color: var(--yellow-800);
+    border-color: var(--yellow-400);
+}

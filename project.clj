@@ -32,13 +32,12 @@
 
 
   :plugins [[lein-cljsbuild "1.1.5"]
-            [lein-doo "0.1.8"]
-            [deraen/lein-sass4clj "0.3.1"]]
+            [lein-doo "0.1.8"]]
   :aliases {"test-all" ["do" "test" ["doo" "once"]]
-            "uberjar"  ["do" "clean" ["sass4clj" "once"] ["cljsbuild" "once" "min"] "uberjar"]}
+            "uberjar"  ["do" "clean" ["cljsbuild" "once" "min"] "uberjar"]}
 
   :auto-clean false
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "resources/public/css"]
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :main ^:skip-aot com.github.discoverAI.snake.core
   :source-paths ["src/clj/" "src/cljc"]
@@ -52,8 +51,6 @@
         :alias {:default [:phantom]}
         :paths {:phantom ~phantomjs-bin}}
   :lein-release {:deploy-via :clojars}
-  :sass {:source-paths ["src/scss/"]
-         :target-path  "resources/public/css"}
   :figwheel {:css-dirs ["resources/public/css"]}
 
   :cljsbuild {:builds [{:id           "dev"

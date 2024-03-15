@@ -1,0 +1,28 @@
+/* grid.css */
+@import url("variables.css");
+
+.grid-container {
+    margin: var(--spacer) auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.field {
+    height: var(--grid-field-size);
+    width: var(--grid-field-size);
+    box-shadow: 0 0 0 var(--grid-gap) var(--grid-gap-color);
+    background-color: white;
+}
+
+.snake {
+    background-color: green !important;
+}
+
+.food {
+    background-color: red !important;
+}

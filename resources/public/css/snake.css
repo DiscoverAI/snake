@@ -1,0 +1,86 @@
+/* snake.css */
+@import url("variables.css");
+@import url("button.css");
+@import url("grid.css");
+
+body {
+  color: var(--font-color);
+  background-color: var(--body-bg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-base);
+  font-family: var(--font-family);
+  line-height: var(--line-height-base);
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: var(--headings-margin-bottom);
+  font-family: var(--font-family);
+  font-weight: var(--headings-font-weight);
+  line-height: var(--headings-line-height);
+  color: var(--font-color);
+}
+
+h1 {
+  font-size: var(--h1-font-size);
+}
+
+h2 {
+  font-size: var(--h2-font-size);
+}
+
+h3 {
+  font-size: var(--h3-font-size);
+}
+
+h4 {
+  font-size: var(--h4-font-size);
+}
+
+h5 {
+  font-size: var(--h5-font-size);
+}
+
+h6 {
+  font-size: var(--h6-font-size);
+}
+
+.wrapper {
+  width: 80%;
+  margin: auto;
+}
+
+header {
+  margin-top: var(--spacer);
+  height: calc(5 * var(--spacer));
+}
+
+.title {
+  float: left;
+  width: 50%;
+}
+
+.score {
+  float: right;
+  width: 50%;
+  text-align: right;
+}
+
+main {
+  clear: both;
+  margin-top: var(--spacer);
+  height: calc(40 * var(--spacer));
+  text-align: center;
+  background: white;
+  display: flex;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+}
+
+footer {
+  text-align: center;
+  padding: var(--spacer);
+}
