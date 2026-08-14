@@ -51,7 +51,8 @@
         :alias {:default [:phantom]}
         :paths {:phantom ~phantomjs-bin}}
   :lein-release {:deploy-via :clojars}
-  :figwheel {:css-dirs ["resources/public/css"]}
+  :figwheel {:css-dirs ["resources/public/css"]
+             :hawk-options {:watcher :polling}}
 
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src/cljs" "src/cljc"]
