@@ -24,7 +24,10 @@
   ::initialize-db
   init-db)
 
-(defn key-pressed [game-id event] (ws-api/send-key-pressed game-id (.-keyCode event)))
+(defn key-pressed [game-id event]
+  (let [key-code (.-keyCode event)]
+    (if (<= ws-api/KEY_ARROW_LEFT key-code ws-api/KEY_ARROW_DOWN) (.preventDefault event))
+    (ws-api/send-key-pressed game-id key-code)))
 
 (defn attach-on-key-listener [game-id]
   (set! (.-onkeydown js/window) (partial key-pressed game-id)))

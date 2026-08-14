@@ -12,13 +12,18 @@
   (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
   (def chsk-state state))
 
+(def KEY_ARROW_LEFT 37)
+(def KEY_ARROW_UP 38)
+(def KEY_ARROW_RIGHT 39)
+(def KEY_ARROW_DOWN 40)
+
 (def KEY_CODE->DIRECTION_VECTOR
   {
    ;Arrows
-   37 [-1 0]
-   38 [0 -1]
-   39 [1 0]
-   40 [0 1]
+   KEY_ARROW_LEFT [-1 0]
+   KEY_ARROW_UP [0 -1]
+   KEY_ARROW_RIGHT [1 0]
+   KEY_ARROW_DOWN [0 1]
    ;WASD
    65 [-1 0]
    87 [0 -1]
