@@ -22,5 +22,5 @@
     --yellow-800: #FF8F00;
     --grid-gap: 1px;
     --grid-gap-color: #dedede;
-    --grid-field-size: 1.5em;
+    --grid-field-size: min(1.5em, 3.2vh);
 }

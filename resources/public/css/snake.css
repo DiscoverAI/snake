@@ -72,7 +72,6 @@ header {
 main {
   clear: both;
   margin-top: var(--spacer);
-  height: calc(40 * var(--spacer));
   text-align: center;
   background: white;
   display: flex;
